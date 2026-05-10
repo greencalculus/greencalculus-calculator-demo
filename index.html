@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scope 1 Stationary Combustion Calculator — GreenCalculus</title>
+<meta name="description" content="Calculate Scope 1 stationary combustion emissions in tCO2e. GHG Protocol aligned, IPCC AR6 GWP-100. Free tool by GreenCalculus.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --c-trust: #1D3215;
+    --c-action: #04BF62;
+    --c-action-dark: #03a554;
+    --c-bg: #0f1a0d;
+    --c-surface: #1a2e17;
+    --c-surface-2: #213820;
+    --c-border: rgba(4,191,98,0.15);
+    --c-text: #e8f5e2;
+    --c-muted: #7a9b72;
+    --c-mono: #a8d4a0;
+    --radius: 10px;
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--c-bg);
+    color: var(--c-text);
+    min-height: 100vh;
+    padding: clamp(1rem, 4vw, 2rem);
+  }
+
+  .gc-wrap {
+    max-width: 900px;
+    margin-inline: auto;
+  }
+
+  /* Header */
+  .gc-header {
+    margin-block-end: 2rem;
+    padding-block-end: 1.5rem;
+    border-bottom: 1px solid var(--c-border);
+  }
+
+  .gc-wordmark {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--c-action);
+    margin-block-end: 0.5rem;
+  }
+
+  .gc-wordmark a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .gc-header h1 {
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    font-weight: 600;
+    line-height: 1.2;
+    margin-block-end: 0.5rem;
+  }
+
+  .gc-header p {
+    font-size: 0.9rem;
+    color: var(--c-muted);
+    line-height: 1.6;
+  }
+
+  .gc-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block-start: 0.75rem;
+  }
+
+  .gc-badge {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    background: var(--c-surface-2);
+    border: 1px solid var(--c-border);
+    color: var(--c-mono);
+  }
+
+  /* Calculator grid */
+  .gc-calc {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  @media (max-width: 600px) {
+    .gc-calc { grid-template-columns: 1fr; }
+  }
+
+  .gc-panel {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+  }
+
+  .gc-panel h2 {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+    margin-block-end: 1.25rem;
+  }
+
+  /* Form elements */
+  .gc-field {
+    margin-block-end: 1.25rem;
+  }
+
+  .gc-field label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--c-muted);
+    margin-block-end: 0.4rem;
+  }
+
+  .gc-field select,
+  .gc-field input {
+    width: 100%;
+    padding: 0.6rem 0.85rem;
+    background: var(--c-surface-2);
+    border: 1px solid var(--c-border);
+    border-radius: 6px;
+    color: var(--c-text);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    appearance: none;
+    transition: border-color 0.15s;
+  }
+
+  .gc-field select:focus,
+  .gc-field input:focus {
+    outline: none;
+    border-color: var(--c-action);
+  }
+
+  .gc-field .gc-unit {
+    font-size: 0.75rem;
+    color: var(--c-muted);
+    margin-block-start: 0.3rem;
+    font-family: var(--font-mono);
+  }
+
+  .gc-btn {
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--c-action);
+    color: #0f1a0d;
+    border: none;
+    border-radius: 6px;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-block-start: 0.5rem;
+  }
+
+  .gc-btn:hover { background: var(--c-action-dark); }
+
+  /* Results */
+  .gc-result-primary {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: var(--c-surface-2);
+    border-radius: var(--radius);
+    margin-block-end: 1.25rem;
+    border: 1px solid var(--c-border);
+  }
+
+  .gc-result-label {
+    font-size: 0.75rem;
+    color: var(--c-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-block-end: 0.5rem;
+  }
+
+  .gc-result-value {
+    font-family: var(--font-mono);
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 500;
+    color: var(--c-action);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  .gc-result-unit {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--c-muted);
+    margin-block-start: 0.4rem;
+  }
+
+  .gc-breakdown {
+    border-top: 1px solid var(--c-border);
+    padding-block-start: 1rem;
+  }
+
+  .gc-breakdown h3 {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+    margin-block-end: 0.75rem;
+  }
+
+  .gc-breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: 0.35rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 0.82rem;
+  }
+
+  .gc-breakdown-row:last-child { border-bottom: none; }
+
+  .gc-breakdown-key { color: var(--c-muted); }
+
+  .gc-breakdown-val {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--c-text);
+  }
+
+  /* Insight callout */
+  .gc-insight {
+    margin-block-start: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: var(--c-surface);
+    border-left: 3px solid var(--c-action);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 0.85rem;
+    color: var(--c-muted);
+    line-height: 1.6;
+  }
+
+  .gc-insight strong { color: var(--c-text); }
+
+  /* Footer */
+  .gc-footer {
+    margin-block-start: 2.5rem;
+    padding-block-start: 1.5rem;
+    border-top: 1px solid var(--c-border);
+    font-size: 0.78rem;
+    color: var(--c-muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    align-items: center;
+  }
+
+  .gc-footer a { color: var(--c-action); text-decoration: none; }
+  .gc-footer a:hover { text-decoration: underline; }
+
+  .gc-empty {
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    color: var(--c-muted);
+    text-align: center;
+    padding: 2rem 0;
+  }
+</style>
+</head>
+<body>
+<div class="gc-wrap">
+
+  <header class="gc-header">
+    <div class="gc-wordmark"><a href="https://greencalculus.com">GreenCalculus</a></div>
+    <h1>Scope 1 Stationary Combustion Calculator</h1>
+    <p>Calculate direct GHG emissions from fuel combustion in owned or controlled equipment.
+       Results in tonnes CO₂e per GHG Protocol Corporate Standard.</p>
+    <div class="gc-badges">
+      <span class="gc-badge">GHG Protocol Scope 1</span>
+      <span class="gc-badge">IPCC AR6 GWP-100</span>
+      <span class="gc-badge">Vanilla JS</span>
+      <span class="gc-badge">Zero dependencies</span>
+    </div>
+  </header>
+
+  <div class="gc-calc">
+
+    <!-- INPUTS -->
+    <div class="gc-panel">
+      <h2>Inputs</h2>
+
+      <div class="gc-field">
+        <label for="fuel">Fuel type</label>
+        <select id="fuel" onchange="updateUnits()">
+          <option value="natural_gas_kwh">Natural gas (kWh GCV)</option>
+          <option value="natural_gas_m3">Natural gas (m³)</option>
+          <option value="diesel">Diesel</option>
+          <option value="petrol">Petrol</option>
+          <option value="lpg">LPG</option>
+          <option value="fuel_oil">Fuel oil (heavy)</option>
+          <option value="kerosene">Kerosene</option>
+          <option value="coal_industrial">Coal (industrial)</option>
+          <option value="coal_domestic">Coal (domestic)</option>
+          <option value="wood_chips">Wood chips (biomass)</option>
+        </select>
+      </div>
+
+      <div class="gc-field">
+        <label for="quantity">Quantity consumed</label>
+        <input type="number" id="quantity" min="0" step="any" placeholder="0.00">
+        <div class="gc-unit" id="unit-label">Unit: kWh</div>
+      </div>
+
+      <div class="gc-field">
+        <label for="period">Reporting period</label>
+        <select id="period">
+          <option value="1">Annual</option>
+          <option value="0.25">Quarterly</option>
+          <option value="0.0833">Monthly</option>
+        </select>
+      </div>
+
+      <button class="gc-btn" onclick="calculate()">Calculate Emissions</button>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="gc-panel">
+      <h2>Results</h2>
+
+      <div class="gc-result-primary">
+        <div class="gc-result-label">Total Emissions</div>
+        <div class="gc-result-value" id="result-value">
+          <span class="gc-empty">—</span>
+        </div>
+        <div class="gc-result-unit" id="result-unit"></div>
+      </div>
+
+      <div class="gc-breakdown" id="breakdown" style="display:none">
+        <h3>Calculation breakdown</h3>
+        <div class="gc-breakdown-row">
+          <span class="gc-breakdown-key">Fuel</span>
+          <span class="gc-breakdown-val" id="bd-fuel">—</span>
+        </div>
+        <div class="gc-breakdown-row">
+          <span class="gc-breakdown-key">Quantity</span>
+          <span class="gc-breakdown-val" id="bd-qty">—</span>
+        </div>
+        <div class="gc-breakdown-row">
+          <span class="gc-breakdown-key">Emission factor</span>
+          <span class="gc-breakdown-val" id="bd-factor">—</span>
+        </div>
+        <div class="gc-breakdown-row">
+          <span class="gc-breakdown-key">GWP basis</span>
+          <span class="gc-breakdown-val">IPCC AR6 GWP-100</span>
+        </div>
+        <div class="gc-breakdown-row">
+          <span class="gc-breakdown-key">Raw result (kg CO₂e)</span>
+          <span class="gc-breakdown-val" id="bd-kg">—</span>
+        </div>
+        <div class="gc-breakdown-row">
+          <span class="gc-breakdown-key">Annualised (tCO₂e)</span>
+          <span class="gc-breakdown-val" id="bd-annual">—</span>
+        </div>
+        <div class="gc-breakdown-row">
+          <span class="gc-breakdown-key">Source</span>
+          <span class="gc-breakdown-val">DESNZ 2024</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gc-insight" id="insight" style="display:none">
+    <strong>Why this matters:</strong>
+    Stationary combustion is typically the largest Scope 1 source for
+    manufacturing, logistics, and commercial real estate. Under the
+    <strong>GHG Protocol Corporate Standard</strong>, all fuel burned in
+    equipment you own or control must be reported as Scope 1 regardless
+    of fuel type. Switching from coal to natural gas reduces emissions
+    per kWh by approximately 50%; switching to grid electricity moves
+    the emission to Scope 2 and enables renewable energy matching.
+  </div>
+
+  <footer class="gc-footer">
+    <span>Full platform: <a href="https://greencalculus.com">GreenCalculus.com</a></span>
+    <span>Methodology: <a href="https://github.com/greencalculus/greencalculus-methodology">greencalculus-methodology</a></span>
+    <span>Standard: GHG Protocol Corporate Standard</span>
+    <span>Factors: UK DESNZ 2024</span>
+  </footer>
+
+</div>
+
+<script>
+  const FACTORS = {
+    natural_gas_kwh:  { factor: 0.18293, unit: 'kWh',   name: 'Natural gas (kWh GCV)',    biomass: false },
+    natural_gas_m3:   { factor: 2.03042, unit: 'm³',    name: 'Natural gas (m³)',          biomass: false },
+    diesel:           { factor: 2.51060, unit: 'litres', name: 'Diesel',                   biomass: false },
+    petrol:           { factor: 2.15270, unit: 'litres', name: 'Petrol',                   biomass: false },
+    lpg:              { factor: 1.55540, unit: 'litres', name: 'LPG',                      biomass: false },
+    fuel_oil:         { factor: 3.17920, unit: 'litres', name: 'Fuel oil (heavy)',          biomass: false },
+    kerosene:         { factor: 2.53980, unit: 'litres', name: 'Kerosene',                 biomass: false },
+    coal_industrial:  { factor: 2.40500, unit: 'tonnes', name: 'Coal (industrial)',         biomass: false },
+    coal_domestic:    { factor: 2.88300, unit: 'tonnes', name: 'Coal (domestic)',           biomass: false },
+    wood_chips:       { factor: 0.02290, unit: 'tonnes', name: 'Wood chips (biomass)',      biomass: true  },
+  };
+
+  function updateUnits() {
+    const key = document.getElementById('fuel').value;
+    const f = FACTORS[key];
+    document.getElementById('unit-label').textContent = 'Unit: ' + f.unit;
+    document.getElementById('quantity').placeholder = '0.00';
+  }
+
+  function calculate() {
+    const key    = document.getElementById('fuel').value;
+    const qty    = parseFloat(document.getElementById('quantity').value);
+    const period = parseFloat(document.getElementById('period').value);
+
+    if (!qty || qty <= 0) {
+      document.getElementById('result-value').innerHTML = '<span class="gc-empty">Enter a quantity</span>';
+      document.getElementById('result-unit').textContent = '';
+      document.getElementById('breakdown').style.display = 'none';
+      document.getElementById('insight').style.display = 'none';
+      return;
+    }
+
+    const f        = FACTORS[key];
+    const kg       = qty * f.factor;
+    const annualKg = kg / period;
+    const annualT  = annualKg / 1000;
+
+    const display  = annualT >= 1
+      ? annualT.toFixed(2)
+      : annualT.toFixed(4);
+
+    document.getElementById('result-value').textContent = display;
+    document.getElementById('result-unit').textContent  = 'tCO₂e' + (period < 1 ? ' (annualised)' : '');
+
+    document.getElementById('bd-fuel').textContent   = f.name;
+    document.getElementById('bd-qty').textContent    = qty.toLocaleString() + ' ' + f.unit;
+    document.getElementById('bd-factor').textContent = f.factor + ' kg CO₂e / ' + f.unit;
+    document.getElementById('bd-kg').textContent     = kg.toFixed(2) + ' kg';
+    document.getElementById('bd-annual').textContent = annualT >= 1 ? annualT.toFixed(2) : annualT.toFixed(4);
+
+    document.getElementById('breakdown').style.display = 'block';
+    document.getElementById('insight').style.display   = 'block';
+  }
+
+  document.getElementById('quantity').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') calculate();
+  });
+</script>
+</body>
+</html>
