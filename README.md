@@ -1,11 +1,25 @@
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/greencalculus/.github/main/profile/assets/greencalculus-logo.png" width="72" height="72" alt="GreenCalculus" />
+
 # GreenCalculus — Carbon Calculator Demos
 
-**Live demos:** https://greencalculus.github.io/greencalculus-calculator-demo/
+### Open-source, zero-dependency demos of production carbon calculators.
 
-Open-source, self-contained demos of production calculators from
-[GreenCalculus.com](https://greencalculus.com) — the platform hosting 1,000+ carbon
-and environmental calculators for sustainability officers, engineers, and CSRD
-compliance teams.
+[**Live demos**](https://greencalculus.github.io/greencalculus-calculator-demo/) · [greencalculus.com](https://greencalculus.com) · [Methodology](https://github.com/greencalculus/greencalculus-methodology) · [Standards](https://github.com/greencalculus/greencalculus-standards)
+
+![Vanilla JS](https://img.shields.io/badge/Vanilla_JS-Zero_dependencies-04BF62?style=flat-square)
+![GHG Protocol](https://img.shields.io/badge/GHG_Protocol-Corporate-04BF62?style=flat-square)
+![IPCC AR6](https://img.shields.io/badge/IPCC_AR6-GWP--100-04BF62?style=flat-square)
+![License: MIT](https://img.shields.io/badge/License-MIT-04BF62?style=flat-square)
+
+</div>
+
+---
+
+Self-contained demos of production calculators from
+[GreenCalculus.com](https://greencalculus.com) — built for sustainability officers,
+engineers, and CSRD compliance teams.
 
 Each demo is a **single HTML file**: vanilla JavaScript, zero dependencies, built to
 GHG Protocol and IPCC AR6. Open the demo, or jump straight to the full live calculator.
@@ -19,8 +33,9 @@ GHG Protocol and IPCC AR6. Open the demo, or jump straight to the full live calc
 | 🔥 **[Scope 1 Stationary Combustion](./stationary-combustion.html)** | Direct fuel combustion → tCO₂e, 10 fuel types | [Open live ↗](https://greencalculus.com/calculators/scope-1-combustion-calculator/) |
 | 🎯 **[SBTi Near-Term Target](./sbti-near-term-target.html)** | Science-based target via Absolute Contraction | [Open live ↗](https://greencalculus.com/calculators/sbti-near-term-target-calculator/) |
 | 🌿 **[FLAG Emissions](./flag-emissions.html)** | Forest, Land & Agriculture — LUC + LM + Removals | [Open live ↗](https://greencalculus.com/calculators/flag-emissions-calculator/) |
+| 💰 **[PCAF Financed Emissions](./pcaf-financed-emissions.html)** | All 7 PCAF Part A asset classes + DQ score; hub to the 10-calc suite | [Open live ↗](https://greencalculus.com/calculators/pcaf-listed-equity-corporate-bonds/) |
 
-The landing page ([`index.html`](./index.html)) is a gallery linking all three.
+The landing page ([`index.html`](./index.html)) is a gallery linking all four.
 
 ---
 
@@ -57,6 +72,19 @@ the **SBTi FLAG 20%** eligibility check.
 - **Standard:** GHG Protocol Land Sector & Removals Standard (2026) · SBTi FLAG
 - **Factors:** IPCC AR6 Tier 1 · DEFRA 2025 · **GWP:** IPCC AR6 GWP-100
 
+### 💰 PCAF Financed Emissions
+
+One universal engine for all **7 PCAF Part A asset classes** — `financed emissions =
+(outstanding ÷ denominator) × investee emissions`. Selecting an asset class relabels the
+attribution denominator (EVIC, total equity + debt, property value at origination,
+PPP-adjusted GDP, …), computes the attribution factor and the **auto-derived PCAF
+data-quality score (1–5)**, and deep-links to that class's live calculator. Doubles as a
+hub linking the full 10-calculator PCAF suite (Part A, facilitated, insurance-associated,
+and the cross-asset data-quality tool).
+
+- **Standard:** PCAF Global GHG Accounting & Reporting Standard (Financed Emissions)
+- **Method:** attribution-factor accounting · auto-derived data-quality score
+
 ---
 
 ## Technical spec
@@ -84,12 +112,12 @@ All emission factors and GWP values are documented in:
 
 ## Full platform
 
-A demo of three calculators from [GreenCalculus.com](https://greencalculus.com),
-which hosts 1,000+ carbon and environmental calculators for sustainability officers,
-engineers, and CSRD compliance teams.
+A demo of four calculators from [GreenCalculus.com](https://greencalculus.com) — the
+traceable reference layer for corporate carbon accounting, built for sustainability
+officers, engineers, and CSRD compliance teams.
 
-**Built by [Jeremiah Say](https://greencalculus.com/about/jeremiah-say/)**
-Lead Systems Architect · GHG Protocol · IPCC AR6 · CSRD
+**Built and maintained by [Jeremiah Say](https://greencalculus.com/about/jeremiah-say/)**
+— Lead Systems Architect · GHG Protocol · IPCC AR6 · CSRD/ESRS E1 · SBTi · PCAF
 
 ---
 
