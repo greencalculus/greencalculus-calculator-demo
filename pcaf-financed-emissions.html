@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCAF Financed Emissions Calculator — GreenCalculus</title>
+<meta name="description" content="Calculate PCAF financed emissions across all 7 asset classes with one engine: attribution factor = outstanding ÷ denominator, plus the auto-derived PCAF data-quality score (1–5). Links to the full PCAF suite. Free demo by GreenCalculus.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --c-action: #04BF62;
+    --c-action-dark: #03a554;
+    --c-bg: #0f1a0d;
+    --c-surface: #1a2e17;
+    --c-surface-2: #213820;
+    --c-border: rgba(4,191,98,0.15);
+    --c-text: #e8f5e2;
+    --c-muted: #7a9b72;
+    --c-mono: #a8d4a0;
+    /* PCAF data-quality scale */
+    --dq1: #04BF62; --dq2: #6FCF52; --dq3: #D4C20B; --dq4: #D4860B; --dq5: #E05252;
+    --radius: 10px;
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans); background: var(--c-bg); color: var(--c-text);
+    min-height: 100vh; padding: clamp(1rem, 4vw, 2rem);
+  }
+  .gc-wrap { max-width: 960px; margin-inline: auto; }
+
+  .gc-nav {
+    display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem;
+    font-family: var(--font-mono); color: var(--c-muted); margin-block-end: 1.5rem;
+  }
+  .gc-nav a { color: var(--c-action); text-decoration: none; }
+  .gc-nav a:hover { text-decoration: underline; }
+
+  .gc-header { margin-block-end: 2rem; padding-block-end: 1.5rem; border-bottom: 1px solid var(--c-border); }
+  .gc-wordmark {
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--c-action); margin-block-end: 0.5rem;
+  }
+  .gc-wordmark a { color: inherit; text-decoration: none; }
+  .gc-header h1 { font-size: clamp(1.25rem, 3vw, 1.75rem); font-weight: 600; line-height: 1.2; margin-block-end: 0.5rem; }
+  .gc-header p { font-size: 0.9rem; color: var(--c-muted); line-height: 1.6; }
+  .gc-header code { font-family: var(--font-mono); color: var(--c-mono); font-size: 0.85em; }
+  .gc-badges { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-start: 0.75rem; }
+  .gc-badge {
+    font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px;
+    background: var(--c-surface-2); border: 1px solid var(--c-border); color: var(--c-mono);
+  }
+
+  .gc-calc { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+  @media (max-width: 760px) { .gc-calc { grid-template-columns: 1fr; } }
+
+  .gc-panel { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius); padding: 1.5rem; }
+  .gc-panel > h2 {
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--c-muted); margin-block-end: 1.25rem;
+  }
+
+  .gc-field { margin-block-end: 1.1rem; }
+  .gc-field label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--c-muted); margin-block-end: 0.4rem; }
+  .gc-field select, .gc-field input {
+    width: 100%; padding: 0.6rem 0.85rem; background: var(--c-surface-2);
+    border: 1px solid var(--c-border); border-radius: 6px; color: var(--c-text);
+    font-family: var(--font-mono); font-size: 0.9rem; appearance: none; transition: border-color 0.15s;
+  }
+  .gc-field select:focus, .gc-field input:focus { outline: none; border-color: var(--c-action); }
+  .gc-field .gc-unit { font-size: 0.73rem; color: var(--c-muted); margin-block-start: 0.3rem; font-family: var(--font-mono); }
+  .gc-two { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+
+  .gc-toggle { display: flex; gap: 0; border: 1px solid var(--c-border); border-radius: 6px; overflow: hidden; }
+  .gc-toggle button {
+    flex: 1; padding: 0.5rem; background: var(--c-surface-2); color: var(--c-muted);
+    border: none; font-family: var(--font-mono); font-size: 0.8rem; cursor: pointer; transition: 0.15s;
+  }
+  .gc-toggle button.is-active { background: var(--c-action); color: #0f1a0d; font-weight: 600; }
+
+  .gc-btn {
+    width: 100%; padding: 0.8rem; background: var(--c-action); color: #0f1a0d; border: none;
+    border-radius: 6px; font-family: var(--font-sans); font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; transition: background 0.15s; margin-block-start: 0.5rem;
+  }
+  .gc-btn:hover { background: var(--c-action-dark); }
+
+  .gc-result-primary {
+    text-align: center; padding: 1.5rem 1rem; background: var(--c-surface-2); border-radius: var(--radius);
+    margin-block-end: 1.1rem; border: 1px solid var(--c-border);
+  }
+  .gc-result-label { font-size: 0.72rem; color: var(--c-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-block-end: 0.5rem; }
+  .gc-result-value {
+    font-family: var(--font-mono); font-size: clamp(1.9rem, 5vw, 2.5rem); font-weight: 500;
+    color: var(--c-action); font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .gc-result-unit { font-family: var(--font-mono); font-size: 0.82rem; color: var(--c-muted); margin-block-start: 0.4rem; }
+
+  /* DQ badge */
+  .gc-dq {
+    display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+    margin-block-end: 1.1rem; padding: 0.7rem; border-radius: var(--radius);
+    background: var(--c-surface-2); border: 1px solid var(--c-border);
+  }
+  .gc-dq-chip {
+    font-family: var(--font-mono); font-weight: 600; font-size: 0.95rem; color: #0f1a0d;
+    width: 1.9rem; height: 1.9rem; display: grid; place-items: center; border-radius: 6px;
+  }
+  .gc-dq-text { font-size: 0.8rem; color: var(--c-text); line-height: 1.3; text-align: left; }
+  .gc-dq-text small { display: block; color: var(--c-muted); font-family: var(--font-mono); font-size: 0.72rem; }
+
+  .gc-breakdown { border-top: 1px solid var(--c-border); padding-block-start: 1rem; }
+  .gc-breakdown h3 { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-muted); margin-block-end: 0.75rem; }
+  .gc-breakdown-row {
+    display: flex; justify-content: space-between; align-items: center; padding-block: 0.35rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem; gap: 1rem;
+  }
+  .gc-breakdown-row:last-child { border-bottom: none; }
+  .gc-breakdown-key { color: var(--c-muted); }
+  .gc-breakdown-val { font-family: var(--font-mono); font-size: 0.82rem; font-variant-numeric: tabular-nums; color: var(--c-text); text-align: right; }
+  .gc-breakdown-val.pos { color: var(--c-action); }
+
+  .gc-empty { font-family: var(--font-mono); font-size: 1.1rem; color: var(--c-muted); text-align: center; padding: 2rem 0; }
+
+  .gc-livelink {
+    display: block; margin-block-start: 1.1rem; padding: 0.7rem 1rem; text-align: center;
+    border: 1px dashed var(--c-border); border-radius: 6px; font-size: 0.82rem;
+    color: var(--c-action); text-decoration: none; transition: 0.15s;
+  }
+  .gc-livelink:hover { border-color: var(--c-action); background: rgba(4,191,98,0.06); }
+
+  /* Hub directory */
+  .gc-hub { margin-block-start: 2.5rem; }
+  .gc-hub h2 {
+    font-size: 0.9rem; font-weight: 600; margin-block-end: 0.4rem;
+  }
+  .gc-hub > p { font-size: 0.85rem; color: var(--c-muted); margin-block-end: 1.25rem; line-height: 1.6; }
+  .gc-hub-group { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-action); margin: 1.25rem 0 0.6rem; }
+  .gc-hub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.6rem; }
+  .gc-spoke {
+    display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;
+    padding: 0.7rem 0.9rem; background: var(--c-surface); border: 1px solid var(--c-border);
+    border-radius: 8px; text-decoration: none; color: var(--c-text); font-size: 0.83rem; transition: 0.15s;
+  }
+  .gc-spoke:hover { border-color: rgba(4,191,98,0.4); transform: translateY(-1px); }
+  .gc-spoke .arr { color: var(--c-action); font-family: var(--font-mono); }
+
+  .gc-insight {
+    margin-block-start: 2.5rem; padding: 1rem 1.25rem; background: var(--c-surface);
+    border-left: 3px solid var(--c-action); border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 0.85rem; color: var(--c-muted); line-height: 1.6;
+  }
+  .gc-insight strong { color: var(--c-text); }
+
+  .gc-footer {
+    margin-block-start: 2.5rem; padding-block-start: 1.5rem; border-top: 1px solid var(--c-border);
+    font-size: 0.78rem; color: var(--c-muted); display: flex; flex-wrap: wrap;
+    gap: 0.5rem 1.5rem; align-items: center; line-height: 1.7;
+  }
+  .gc-footer a { color: var(--c-action); text-decoration: none; }
+  .gc-footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="gc-wrap">
+
+  <nav class="gc-nav">
+    <a href="./index.html">← All calculators</a>
+    <span>/</span>
+    <span>PCAF Financed Emissions</span>
+  </nav>
+
+  <header class="gc-header">
+    <div class="gc-wordmark"><a href="https://greencalculus.com">GreenCalculus</a></div>
+    <h1>PCAF Financed Emissions Calculator</h1>
+    <p>One engine for all seven PCAF asset classes. The financed-emissions formula is universal —
+       <code>financed emissions = (outstanding ÷ denominator) × investee emissions</code> — only the
+       <strong>attribution denominator</strong> changes. Pick an asset class, get the financed emissions,
+       attribution factor, and auto-derived <strong>PCAF data-quality score (1–5)</strong>, then jump to
+       the full calculator for that class.</p>
+    <div class="gc-badges">
+      <span class="gc-badge">PCAF Standard Part A</span>
+      <span class="gc-badge">7 asset classes</span>
+      <span class="gc-badge">DQ score 1–5</span>
+      <span class="gc-badge">Vanilla JS</span>
+    </div>
+  </header>
+
+  <div class="gc-calc">
+
+    <!-- INPUTS -->
+    <div class="gc-panel">
+      <h2>Inputs</h2>
+
+      <div class="gc-field">
+        <label for="assetClass">Asset class</label>
+        <select id="assetClass" onchange="onClassChange()"></select>
+        <div class="gc-unit" id="classNote"></div>
+      </div>
+
+      <div class="gc-two">
+        <div class="gc-field">
+          <label id="lblOutstanding" for="outstanding">Outstanding amount</label>
+          <input type="number" id="outstanding" min="0" step="any" placeholder="0">
+          <div class="gc-unit" id="unitOutstanding">currency units</div>
+        </div>
+        <div class="gc-field">
+          <label id="lblDenom" for="denom">EVIC</label>
+          <input type="number" id="denom" min="0" step="any" placeholder="0">
+          <div class="gc-unit" id="unitDenom">same currency as outstanding</div>
+        </div>
+      </div>
+
+      <div class="gc-field">
+        <label id="lblEmissions" for="emissions">Investee emissions (Scope 1 + 2)</label>
+        <input type="number" id="emissions" min="0" step="any" placeholder="0">
+        <div class="gc-unit">tCO₂e · the borrower / investee's own emissions</div>
+      </div>
+
+      <div class="gc-field">
+        <label for="scope3">Investee Scope 3 <span style="color:var(--c-muted)">(optional)</span></label>
+        <input type="number" id="scope3" min="0" step="any" placeholder="0">
+        <div class="gc-unit">tCO₂e · included in attribution when entered</div>
+      </div>
+
+      <div class="gc-field">
+        <label for="dataSource">Emission-data source <span style="color:var(--c-muted)">(sets DQ score)</span></label>
+        <select id="dataSource"></select>
+      </div>
+
+      <div class="gc-field">
+        <label id="lblDenomBasis">Is the denominator value reported or estimated?</label>
+        <div class="gc-toggle" id="denomBasis">
+          <button type="button" data-est="false" class="is-active">Reported / known</button>
+          <button type="button" data-est="true">Estimated</button>
+        </div>
+        <div class="gc-unit">An estimated denominator degrades the economic-estimate path (score 4 → 5, PCAF Table 5-3).</div>
+      </div>
+
+      <button class="gc-btn" onclick="calculate()">Calculate Financed Emissions</button>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="gc-panel">
+      <h2>Results</h2>
+
+      <div class="gc-result-primary">
+        <div class="gc-result-label">Financed emissions</div>
+        <div class="gc-result-value" id="rv"><span class="gc-empty">—</span></div>
+        <div class="gc-result-unit" id="ru"></div>
+      </div>
+
+      <div class="gc-dq" id="dqBox" style="display:none;">
+        <span class="gc-dq-chip" id="dqChip">—</span>
+        <span class="gc-dq-text" id="dqText"></span>
+      </div>
+
+      <div class="gc-breakdown" id="breakdown" style="display:none;">
+        <h3>Calculation breakdown</h3>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Asset class</span><span class="gc-breakdown-val" id="bd-class">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Outstanding ÷ denominator</span><span class="gc-breakdown-val" id="bd-ratio">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Attribution factor</span><span class="gc-breakdown-val pos" id="bd-attr">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Attributed emissions base</span><span class="gc-breakdown-val" id="bd-base">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Economic intensity</span><span class="gc-breakdown-val" id="bd-intensity">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">PCAF option</span><span class="gc-breakdown-val" id="bd-option">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Standard</span><span class="gc-breakdown-val">PCAF Part A</span></div>
+      </div>
+
+      <a class="gc-livelink" id="liveLink" href="#" style="display:none;">Open the full calculator on GreenCalculus.com ↗</a>
+    </div>
+  </div>
+
+  <!-- HUB DIRECTORY -->
+  <section class="gc-hub">
+    <h2>The full PCAF suite</h2>
+    <p>This demo computes Part A asset classes. Each calculator below runs the complete methodology on
+       GreenCalculus.com — with weighted-average data quality, intensity metrics, and audit-ready exports.</p>
+
+    <div class="gc-hub-group">Part A · Financed emissions (7 asset classes)</div>
+    <div class="gc-hub-grid" id="hubPartA"></div>
+
+    <div class="gc-hub-group">Part B · Facilitated emissions</div>
+    <div class="gc-hub-grid" id="hubPartB"></div>
+
+    <div class="gc-hub-group">Part C · Insurance-associated emissions</div>
+    <div class="gc-hub-grid" id="hubPartC"></div>
+
+    <div class="gc-hub-group">Cross-asset-class tooling</div>
+    <div class="gc-hub-grid" id="hubTools"></div>
+  </section>
+
+  <div class="gc-insight">
+    <strong>Why one engine works:</strong>
+    Every PCAF Part A asset class attributes a slice of the borrower's or investee's emissions to the
+    financier using <code>attribution factor = outstanding amount ÷ denominator</code>. Only the denominator
+    differs — EVIC for listed equity, total equity + debt for business loans, property value at origination
+    for real estate, PPP-adjusted GDP for sovereigns. The <strong>data-quality score (1–5)</strong> follows
+    PCAF's evidence hierarchy: reported &amp; verified (1) down to a sector-revenue proxy (5). Lower is better,
+    and it's reported alongside every tonne so users know how solid the number is.
+  </div>
+
+  <footer class="gc-footer">
+    <span>Live suite: <a href="https://greencalculus.com/calculators/pcaf-listed-equity-corporate-bonds/">PCAF calculators on GreenCalculus.com ↗</a></span>
+    <span>Methodology: <a href="https://github.com/greencalculus/greencalculus-methodology">greencalculus-methodology</a></span>
+    <span>Standard: PCAF Global GHG Accounting &amp; Reporting Standard (Financed Emissions)</span>
+  </footer>
+
+</div>
+
+<script>
+  const LIVE_BASE = 'https://greencalculus.com/calculators/';
+
+  // PCAF Part A asset classes — same engine, different attribution denominator.
+  const CLASSES = {
+    listed_equity: {
+      label: 'Listed Equity & Corporate Bonds',
+      denom: 'EVIC', denomHelp: 'Enterprise value including cash (do NOT subtract cash)',
+      outLabel: 'Outstanding amount', slug: 'pcaf-listed-equity-corporate-bonds',
+    },
+    business_loans: {
+      label: 'Business Loans & Unlisted Equity',
+      denom: 'Total equity + debt', denomHelp: 'Sum of total company equity and debt (balance sheet)',
+      outLabel: 'Outstanding amount', slug: 'pcaf-business-loans-unlisted-equity-calculator',
+    },
+    project_finance: {
+      label: 'Project Finance',
+      denom: 'Total project equity + debt', denomHelp: 'Total project value (equity + debt at financial close)',
+      outLabel: 'Outstanding amount', slug: 'pcaf-project-finance-calculator',
+    },
+    cre: {
+      label: 'Commercial Real Estate',
+      denom: 'Property value at origination', denomHelp: 'Market value of the property when the loan was issued',
+      outLabel: 'Outstanding amount', slug: 'pcaf-commercial-real-estate-calculator',
+    },
+    mortgages: {
+      label: 'Mortgages',
+      denom: 'Property value at origination', denomHelp: 'Value of the residential property at loan origination',
+      outLabel: 'Outstanding amount', slug: 'pcaf-mortgages-calculator',
+    },
+    motor: {
+      label: 'Motor Vehicle Loans',
+      denom: 'Vehicle value at origination', denomHelp: 'Total value of the vehicle when the loan was issued',
+      outLabel: 'Outstanding amount', slug: 'pcaf-motor-vehicle-loans-calculator',
+    },
+    sovereign: {
+      label: 'Sovereign Debt',
+      denom: 'PPP-adjusted GDP', denomHelp: 'Purchasing-power-parity-adjusted GDP of the country',
+      outLabel: 'Exposure (debt holding)', slug: 'pcaf-sovereign-debt-calculator',
+      note: 'Sovereign debt attributes a share of national emissions via PPP-adjusted GDP.',
+    },
+  };
+
+  // Emission-data source → PCAF option + base DQ score (PCAF Table 5-3 hierarchy).
+  const SOURCES = [
+    { key: 'reported_verified',   label: 'Reported — verified / assured',         option: 'Option 1a', score: 1, kind: 'reported' },
+    { key: 'reported_unverified', label: 'Reported — unverified',                 option: 'Option 1b', score: 2, kind: 'reported' },
+    { key: 'physical_activity',   label: 'Physical activity-based estimate',      option: 'Option 2b', score: 3, kind: 'reported' },
+    { key: 'estimated',           label: 'Estimate from revenue × sector factor', option: 'Option 3',  score: 4, kind: 'estimated' },
+  ];
+
+  const DQ = {
+    1: { label: 'verified',     color: 'var(--dq1)' },
+    2: { label: 'reported',     color: 'var(--dq2)' },
+    3: { label: 'physical',     color: 'var(--dq3)' },
+    4: { label: 'estimated',    color: 'var(--dq4)' },
+    5: { label: 'sector proxy', color: 'var(--dq5)' },
+  };
+
+  // Hub directory (all 10 live calculators).
+  const SPOKES = {
+    hubPartA: [
+      ['Listed Equity & Corporate Bonds', 'pcaf-listed-equity-corporate-bonds'],
+      ['Business Loans & Unlisted Equity', 'pcaf-business-loans-unlisted-equity-calculator'],
+      ['Project Finance', 'pcaf-project-finance-calculator'],
+      ['Commercial Real Estate', 'pcaf-commercial-real-estate-calculator'],
+      ['Mortgages', 'pcaf-mortgages-calculator'],
+      ['Motor Vehicle Loans', 'pcaf-motor-vehicle-loans-calculator'],
+      ['Sovereign Debt', 'pcaf-sovereign-debt-calculator'],
+    ],
+    hubPartB: [ ['Facilitated Emissions (Capital Markets)', 'pcaf-facilitated-emissions-calculator'] ],
+    hubPartC: [ ['Insurance-Associated Emissions', 'pcaf-insurance-associated-calculator'] ],
+    hubTools: [ ['Data Quality Score (1–5)', 'pcaf-data-quality-score-calculator'] ],
+  };
+
+  let denomEstimated = false;
+
+  // --- Init dropdowns + hub ---
+  (function init() {
+    const cls = document.getElementById('assetClass');
+    for (const k in CLASSES) {
+      const o = document.createElement('option');
+      o.value = k; o.textContent = CLASSES[k].label;
+      cls.appendChild(o);
+    }
+    const src = document.getElementById('dataSource');
+    SOURCES.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s.key; o.textContent = s.label + ' (DQ ' + s.score + ')';
+      src.appendChild(o);
+    });
+    for (const groupId in SPOKES) {
+      const grid = document.getElementById(groupId);
+      SPOKES[groupId].forEach(([label, slug]) => {
+        const a = document.createElement('a');
+        a.className = 'gc-spoke';
+        a.href = LIVE_BASE + slug + '/';
+        a.innerHTML = '<span>' + label + '</span><span class="arr">↗</span>';
+        grid.appendChild(a);
+      });
+    }
+    // Denominator-basis toggle
+    document.querySelectorAll('#denomBasis button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#denomBasis button').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        denomEstimated = btn.dataset.est === 'true';
+      });
+    });
+    onClassChange();
+  })();
+
+  function onClassChange() {
+    const c = CLASSES[document.getElementById('assetClass').value];
+    document.getElementById('lblDenom').textContent = c.denom;
+    document.getElementById('unitDenom').textContent = c.denomHelp;
+    document.getElementById('lblOutstanding').textContent = c.outLabel;
+    document.getElementById('lblEmissions').textContent =
+      document.getElementById('assetClass').value === 'sovereign'
+        ? 'National emissions (Scope 1)' : 'Investee emissions (Scope 1 + 2)';
+    document.getElementById('classNote').textContent = c.note || '';
+    // Update the dynamic live deep-link target.
+    const link = document.getElementById('liveLink');
+    link.href = LIVE_BASE + c.slug + '/';
+    link.textContent = 'Open the full ' + c.label + ' calculator ↗';
+  }
+
+  const fmt = (n, d) => n.toLocaleString(undefined, { maximumFractionDigits: d });
+  const fmtT = (n) => Math.abs(n) >= 1 ? fmt(n, 2) : fmt(n, 4);
+
+  function calculate() {
+    const c = CLASSES[document.getElementById('assetClass').value];
+    const outstanding = parseFloat(document.getElementById('outstanding').value) || 0;
+    const denom = parseFloat(document.getElementById('denom').value) || 0;
+    const s12 = parseFloat(document.getElementById('emissions').value) || 0;
+    const s3 = parseFloat(document.getElementById('scope3').value) || 0;
+    const srcKey = document.getElementById('dataSource').value;
+    const src = SOURCES.find(s => s.key === srcKey);
+
+    if (outstanding <= 0 || denom <= 0) {
+      document.getElementById('rv').innerHTML = '<span class="gc-empty">Enter amount + denominator</span>';
+      document.getElementById('ru').textContent = '';
+      ['dqBox','breakdown'].forEach(id => document.getElementById(id).style.display = 'none');
+      document.getElementById('liveLink').style.display = 'none';
+      return;
+    }
+
+    const attribution = outstanding / denom;     // dimensionless ratio (same currency)
+    const emissionsBase = s12 + s3;
+    const financed = attribution * emissionsBase;
+    // Economic intensity: tCO2e per million units outstanding.
+    const intensity = financed / (outstanding / 1e6);
+
+    // Auto-derived DQ score: estimated denominator degrades the economic-estimate path (4 → 5).
+    let score = src.score;
+    let option = src.option;
+    if (src.kind === 'estimated' && denomEstimated) { score = 5; option = 'Option 3b'; }
+
+    // --- Render hero ---
+    document.getElementById('rv').textContent = fmtT(financed);
+    document.getElementById('ru').textContent = 'tCO₂e financed' + (s3 > 0 ? ' (incl. Scope 3)' : '');
+
+    // --- DQ badge ---
+    const dq = DQ[score];
+    document.getElementById('dqChip').textContent = score;
+    document.getElementById('dqChip').style.background = dq.color;
+    document.getElementById('dqText').innerHTML =
+      'PCAF data quality <strong>Score ' + score + ' · ' + dq.label + '</strong>'
+      + '<small>' + option + ' · lower is better (1–5)</small>';
+    document.getElementById('dqBox').style.display = 'flex';
+
+    // --- Breakdown ---
+    document.getElementById('bd-class').textContent = c.label;
+    document.getElementById('bd-ratio').textContent = fmt(outstanding, 0) + ' ÷ ' + fmt(denom, 0);
+    document.getElementById('bd-attr').textContent = fmt(attribution * 100, 4) + '%';
+    document.getElementById('bd-base').textContent = fmtT(emissionsBase) + ' tCO₂e';
+    document.getElementById('bd-intensity').textContent = fmtT(intensity) + ' tCO₂e / M';
+    document.getElementById('bd-option').textContent = option;
+    document.getElementById('breakdown').style.display = 'block';
+
+    // --- Dynamic live link ---
+    document.getElementById('liveLink').style.display = 'block';
+  }
+</script>
+</body>
+</html>
