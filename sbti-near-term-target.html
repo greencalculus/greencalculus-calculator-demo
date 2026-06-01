@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SBTi Near-Term Target Calculator — GreenCalculus</title>
+<meta name="description" content="Build a science-based near-term emissions target with the Absolute Contraction Approach. Tests Scope 3 materiality, validates the 4.2%/yr 1.5°C floor, projects a year-by-year trajectory. Free demo by GreenCalculus.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --c-trust: #1D3215;
+    --c-action: #04BF62;
+    --c-action-dark: #03a554;
+    --c-warn: #D4860B;
+    --c-bg: #0f1a0d;
+    --c-surface: #1a2e17;
+    --c-surface-2: #213820;
+    --c-border: rgba(4,191,98,0.15);
+    --c-text: #e8f5e2;
+    --c-muted: #7a9b72;
+    --c-mono: #a8d4a0;
+    --radius: 10px;
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--c-bg);
+    color: var(--c-text);
+    min-height: 100vh;
+    padding: clamp(1rem, 4vw, 2rem);
+  }
+
+  .gc-wrap { max-width: 960px; margin-inline: auto; }
+
+  /* Breadcrumb nav */
+  .gc-nav {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.78rem; font-family: var(--font-mono);
+    color: var(--c-muted); margin-block-end: 1.5rem;
+  }
+  .gc-nav a { color: var(--c-action); text-decoration: none; }
+  .gc-nav a:hover { text-decoration: underline; }
+
+  /* Header */
+  .gc-header {
+    margin-block-end: 2rem; padding-block-end: 1.5rem;
+    border-bottom: 1px solid var(--c-border);
+  }
+  .gc-wordmark {
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--c-action); margin-block-end: 0.5rem;
+  }
+  .gc-wordmark a { color: inherit; text-decoration: none; }
+  .gc-header h1 {
+    font-size: clamp(1.25rem, 3vw, 1.75rem); font-weight: 600;
+    line-height: 1.2; margin-block-end: 0.5rem;
+  }
+  .gc-header p { font-size: 0.9rem; color: var(--c-muted); line-height: 1.6; }
+  .gc-badges { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-start: 0.75rem; }
+  .gc-badge {
+    font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem;
+    border-radius: 4px; background: var(--c-surface-2);
+    border: 1px solid var(--c-border); color: var(--c-mono);
+  }
+
+  /* Calculator grid */
+  .gc-calc {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start;
+  }
+  @media (max-width: 700px) { .gc-calc { grid-template-columns: 1fr; } }
+
+  .gc-panel {
+    background: var(--c-surface); border: 1px solid var(--c-border);
+    border-radius: var(--radius); padding: 1.5rem;
+  }
+  .gc-panel h2 {
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--c-muted); margin-block-end: 1.25rem;
+  }
+
+  /* Form */
+  .gc-field { margin-block-end: 1.1rem; }
+  .gc-field label {
+    display: block; font-size: 0.8rem; font-weight: 500;
+    color: var(--c-muted); margin-block-end: 0.4rem;
+  }
+  .gc-field select, .gc-field input {
+    width: 100%; padding: 0.6rem 0.85rem; background: var(--c-surface-2);
+    border: 1px solid var(--c-border); border-radius: 6px; color: var(--c-text);
+    font-family: var(--font-mono); font-size: 0.9rem; appearance: none;
+    transition: border-color 0.15s;
+  }
+  .gc-field select:focus, .gc-field input:focus { outline: none; border-color: var(--c-action); }
+  .gc-field .gc-unit {
+    font-size: 0.74rem; color: var(--c-muted); margin-block-start: 0.3rem; font-family: var(--font-mono);
+  }
+  .gc-two { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+
+  .gc-btn {
+    width: 100%; padding: 0.8rem; background: var(--c-action); color: #0f1a0d;
+    border: none; border-radius: 6px; font-family: var(--font-sans);
+    font-size: 0.95rem; font-weight: 600; cursor: pointer;
+    transition: background 0.15s; margin-block-start: 0.5rem;
+  }
+  .gc-btn:hover { background: var(--c-action-dark); }
+
+  /* Results */
+  .gc-result-primary {
+    text-align: center; padding: 1.5rem 1rem; background: var(--c-surface-2);
+    border-radius: var(--radius); margin-block-end: 1.1rem; border: 1px solid var(--c-border);
+  }
+  .gc-result-label {
+    font-size: 0.72rem; color: var(--c-muted); letter-spacing: 0.08em;
+    text-transform: uppercase; margin-block-end: 0.5rem;
+  }
+  .gc-result-value {
+    font-family: var(--font-mono); font-size: clamp(1.9rem, 5vw, 2.5rem);
+    font-weight: 500; color: var(--c-action); font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .gc-result-unit {
+    font-family: var(--font-mono); font-size: 0.82rem; color: var(--c-muted); margin-block-start: 0.4rem;
+  }
+  .gc-breakdown { border-top: 1px solid var(--c-border); padding-block-start: 1rem; }
+  .gc-breakdown h3 {
+    font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--c-muted); margin-block-end: 0.75rem;
+  }
+  .gc-breakdown-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-block: 0.35rem; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem; gap: 1rem;
+  }
+  .gc-breakdown-row:last-child { border-bottom: none; }
+  .gc-breakdown-key { color: var(--c-muted); }
+  .gc-breakdown-val {
+    font-family: var(--font-mono); font-size: 0.82rem;
+    font-variant-numeric: tabular-nums; color: var(--c-text); text-align: right;
+  }
+  .gc-breakdown-val.pos { color: var(--c-action); }
+
+  .gc-empty {
+    font-family: var(--font-mono); font-size: 1.25rem; color: var(--c-muted);
+    text-align: center; padding: 2rem 0;
+  }
+
+  /* Materiality pill */
+  .gc-pill {
+    display: inline-block; font-family: var(--font-mono); font-size: 0.7rem;
+    padding: 0.15rem 0.55rem; border-radius: 4px; margin-block-start: 0.5rem;
+  }
+  .gc-pill.req { background: rgba(212,134,11,0.15); color: var(--c-warn); border: 1px solid rgba(212,134,11,0.4); }
+  .gc-pill.ok  { background: rgba(4,191,98,0.12); color: var(--c-action); border: 1px solid var(--c-border); }
+
+  /* Warnings */
+  .gc-warnings { margin-block-start: 1.25rem; display: none; }
+  .gc-warn-item {
+    padding: 0.75rem 1rem; background: rgba(212,134,11,0.08);
+    border-left: 3px solid var(--c-warn); border-radius: 0 6px 6px 0;
+    font-size: 0.82rem; color: var(--c-text); line-height: 1.5; margin-block-end: 0.6rem;
+  }
+  .gc-warn-item:last-child { margin-block-end: 0; }
+  .gc-warn-item strong { color: var(--c-warn); }
+
+  /* Trajectory table */
+  .gc-traj { margin-block-start: 1.5rem; display: none; }
+  .gc-traj h2 {
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--c-muted); margin-block-end: 1rem;
+  }
+  .gc-table-scroll { overflow-x: auto; border: 1px solid var(--c-border); border-radius: var(--radius); }
+  table.gc-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  .gc-table th, .gc-table td {
+    padding: 0.55rem 0.85rem; text-align: right; font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .gc-table th {
+    background: var(--c-surface-2); color: var(--c-muted); font-weight: 500;
+    text-align: right; font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase;
+    position: sticky; top: 0;
+  }
+  .gc-table th:first-child, .gc-table td:first-child { text-align: left; }
+  .gc-table tbody tr { border-top: 1px solid rgba(255,255,255,0.05); }
+  .gc-table tbody tr:nth-child(odd) { background: rgba(255,255,255,0.015); }
+  .gc-table tbody tr.is-base td { color: var(--c-muted); }
+  .gc-table tbody tr.is-target td { color: var(--c-text); font-weight: 500; }
+  .gc-table tbody tr.is-target { background: rgba(4,191,98,0.07); }
+  .gc-table .col-cut { color: var(--c-action); }
+
+  /* Insight */
+  .gc-insight {
+    margin-block-start: 1.5rem; padding: 1rem 1.25rem; background: var(--c-surface);
+    border-left: 3px solid var(--c-action); border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 0.85rem; color: var(--c-muted); line-height: 1.6; display: none;
+  }
+  .gc-insight strong { color: var(--c-text); }
+
+  /* Footer */
+  .gc-footer {
+    margin-block-start: 2.5rem; padding-block-start: 1.5rem; border-top: 1px solid var(--c-border);
+    font-size: 0.78rem; color: var(--c-muted); display: flex; flex-wrap: wrap;
+    gap: 0.5rem 1.5rem; align-items: center; line-height: 1.7;
+  }
+  .gc-footer a { color: var(--c-action); text-decoration: none; }
+  .gc-footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="gc-wrap">
+
+  <nav class="gc-nav">
+    <a href="./index.html">← All calculators</a>
+    <span>/</span>
+    <span>SBTi Near-Term Target</span>
+  </nav>
+
+  <header class="gc-header">
+    <div class="gc-wordmark"><a href="https://greencalculus.com">GreenCalculus</a></div>
+    <h1>SBTi Near-Term Target Calculator</h1>
+    <p>Build a science-based near-term target with the Absolute Contraction Approach (ACA):
+       <code>target = baseline × (1 − rate)<sup>years</sup></code>. Tests Scope 3 materiality,
+       validates the 1.5°C reduction floor, and projects a year-by-year trajectory.</p>
+    <div class="gc-badges">
+      <span class="gc-badge">SBTi Corporate Near-Term</span>
+      <span class="gc-badge">Absolute Contraction</span>
+      <span class="gc-badge">1.5°C aligned</span>
+      <span class="gc-badge">Vanilla JS</span>
+    </div>
+  </header>
+
+  <div class="gc-calc">
+
+    <!-- INPUTS -->
+    <div class="gc-panel">
+      <h2>Inputs</h2>
+
+      <div class="gc-two">
+        <div class="gc-field">
+          <label for="baseYear">Base year</label>
+          <select id="baseYear"></select>
+        </div>
+        <div class="gc-field">
+          <label for="targetYear">Target year</label>
+          <select id="targetYear"></select>
+        </div>
+      </div>
+
+      <div class="gc-field">
+        <label for="ambition">Ambition level</label>
+        <select id="ambition" onchange="onAmbitionChange()">
+          <option value="min">Minimum 1.5°C — 4.2% / 2.5% per yr</option>
+          <option value="accel">Accelerated 1.5°C — 5.0% / 3.0% per yr</option>
+          <option value="lead">Leadership — 7.0% / 4.2% per yr</option>
+          <option value="custom">Custom rates</option>
+        </select>
+      </div>
+
+      <div class="gc-two" id="customRates" style="display:none;">
+        <div class="gc-field">
+          <label for="rate12">Scope 1+2 rate</label>
+          <input type="number" id="rate12" min="0" step="any" placeholder="4.2">
+          <div class="gc-unit">% per year</div>
+        </div>
+        <div class="gc-field">
+          <label for="rate3">Scope 3 rate</label>
+          <input type="number" id="rate3" min="0" step="any" placeholder="2.5">
+          <div class="gc-unit">% per year</div>
+        </div>
+      </div>
+
+      <div class="gc-two">
+        <div class="gc-field">
+          <label for="s1">Scope 1 baseline</label>
+          <input type="number" id="s1" min="0" step="any" placeholder="0">
+          <div class="gc-unit">tCO₂e — direct</div>
+        </div>
+        <div class="gc-field">
+          <label for="s2">Scope 2 baseline</label>
+          <input type="number" id="s2" min="0" step="any" placeholder="0">
+          <div class="gc-unit">tCO₂e — purchased energy</div>
+        </div>
+      </div>
+
+      <div class="gc-field">
+        <label for="s3">Scope 3 baseline <span style="color:var(--c-muted)">(optional)</span></label>
+        <input type="number" id="s3" min="0" step="any" placeholder="0">
+        <div class="gc-unit">tCO₂e — value chain</div>
+      </div>
+
+      <button class="gc-btn" onclick="calculate()">Calculate Target</button>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="gc-panel">
+      <h2>Results</h2>
+
+      <div class="gc-result-primary">
+        <div class="gc-result-label">Scope 1+2 target emissions</div>
+        <div class="gc-result-value" id="rv"><span class="gc-empty">—</span></div>
+        <div class="gc-result-unit" id="ru"></div>
+      </div>
+
+      <div class="gc-breakdown" id="breakdown" style="display:none">
+        <h3>Target summary</h3>
+        <div class="gc-breakdown-row">
+          <span class="gc-breakdown-key">Reduction window</span>
+          <span class="gc-breakdown-val" id="bd-window">—</span>
+        </div>
+        <div class="gc-breakdown-row">
+          <span class="gc-breakdown-key">Scope 1+2 cut by target year</span>
+          <span class="gc-breakdown-val pos" id="bd-cut12">—</span>
+        </div>
+        <div class="gc-breakdown-row">
+          <span class="gc-breakdown-key">Scope 3 target</span>
+          <span class="gc-breakdown-val" id="bd-s3target">—</span>
+        </div>
+        <div class="gc-breakdown-row">
+          <span class="gc-breakdown-key">Scope 3 cut by target year</span>
+          <span class="gc-breakdown-val pos" id="bd-cut3">—</span>
+        </div>
+        <div class="gc-breakdown-row">
+          <span class="gc-breakdown-key">Scope 3 materiality</span>
+          <span class="gc-breakdown-val" id="bd-mat">—</span>
+        </div>
+        <div class="gc-breakdown-row">
+          <span class="gc-breakdown-key">Net-zero reference (2050)</span>
+          <span class="gc-breakdown-val" id="bd-nz">—</span>
+        </div>
+        <div class="gc-breakdown-row">
+          <span class="gc-breakdown-key">Method</span>
+          <span class="gc-breakdown-val">ACA</span>
+        </div>
+      </div>
+
+      <div id="materialityPill"></div>
+
+      <div class="gc-warnings" id="warnings"></div>
+    </div>
+  </div>
+
+  <!-- TRAJECTORY TABLE -->
+  <div class="gc-traj" id="traj">
+    <h2>Year-by-year trajectory</h2>
+    <div class="gc-table-scroll">
+      <table class="gc-table">
+        <thead>
+          <tr>
+            <th>Year</th>
+            <th>Scope 1+2 (tCO₂e)</th>
+            <th class="col-cut">S1+2 cut</th>
+            <th id="th-s3">Scope 3 (tCO₂e)</th>
+            <th class="col-cut" id="th-s3cut">S3 cut</th>
+          </tr>
+        </thead>
+        <tbody id="trajBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="gc-insight" id="insight">
+    <strong>Why the rate compounds:</strong>
+    A 4.2% annual cut does <em>not</em> mean 42% over 10 years. Because each year's reduction
+    applies to a shrinking baseline, <code>(1 − 0.042)<sup>10</sup> = 0.651</code> — a cumulative
+    34.9% cut. Under SBTi Corporate Near-Term criteria a <strong>Scope 3 target is required when
+    Scope 3 is ≥ 40%</strong> of total baseline emissions, and must cover ≥ 67% of the screened
+    Scope 3 total.
+  </div>
+
+  <footer class="gc-footer">
+    <span>Live version: <a href="https://greencalculus.com/calculators/sbti-near-term-target-calculator/">Open the full calculator on GreenCalculus.com ↗</a></span>
+    <span>Methodology: <a href="https://github.com/greencalculus/greencalculus-methodology">greencalculus-methodology</a></span>
+    <span>Standard: SBTi Corporate Near-Term Criteria · GHG Protocol · IPCC AR6 WG3</span>
+  </footer>
+
+</div>
+
+<script>
+  // Submission year — the year the target is being set.
+  const SUBMISSION_YEAR = 2026;
+
+  // Ambition tiers: [Scope 1+2 %/yr, Scope 3 %/yr]
+  const AMBITION = {
+    min:   { r12: 4.2, r3: 2.5, label: 'Minimum 1.5°C' },
+    accel: { r12: 5.0, r3: 3.0, label: 'Accelerated 1.5°C' },
+    lead:  { r12: 7.0, r3: 4.2, label: 'Leadership' },
+  };
+
+  // SBTi minimum floors (1.5°C pathway).
+  const FLOOR_12 = 4.2;   // Scope 1+2 %/yr
+  const FLOOR_3  = 2.5;   // Scope 3 %/yr (when required)
+  const MATERIALITY = 40; // Scope 3 % of total that triggers a required target
+  const NET_ZERO_CUT = 0.90; // ~90% absolute reduction by 2050
+
+  // Populate year dropdowns.
+  (function initYears() {
+    const base = document.getElementById('baseYear');
+    for (let y = 2015; y <= SUBMISSION_YEAR; y++) {
+      const o = document.createElement('option');
+      o.value = y; o.textContent = y;
+      if (y === SUBMISSION_YEAR - 1) o.selected = true; // sensible default: last full year
+      base.appendChild(o);
+    }
+    const target = document.getElementById('targetYear');
+    for (let y = SUBMISSION_YEAR + 5; y <= SUBMISSION_YEAR + 10; y++) {
+      const o = document.createElement('option');
+      o.value = y; o.textContent = y;
+      if (y === SUBMISSION_YEAR + 10) o.selected = true;
+      target.appendChild(o);
+    }
+  })();
+
+  function onAmbitionChange() {
+    const isCustom = document.getElementById('ambition').value === 'custom';
+    document.getElementById('customRates').style.display = isCustom ? 'grid' : 'none';
+  }
+
+  function getRates() {
+    const a = document.getElementById('ambition').value;
+    if (a === 'custom') {
+      return {
+        r12: parseFloat(document.getElementById('rate12').value) || 0,
+        r3:  parseFloat(document.getElementById('rate3').value)  || 0,
+        label: 'Custom',
+      };
+    }
+    return AMBITION[a];
+  }
+
+  const fmt = (n) => n.toLocaleString(undefined, { maximumFractionDigits: 1 });
+  const fmtT = (n) => n >= 1 ? n.toLocaleString(undefined, { maximumFractionDigits: 0 })
+                             : n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+
+  function calculate() {
+    const baseYear   = parseInt(document.getElementById('baseYear').value, 10);
+    const targetYear = parseInt(document.getElementById('targetYear').value, 10);
+    const s1 = parseFloat(document.getElementById('s1').value) || 0;
+    const s2 = parseFloat(document.getElementById('s2').value) || 0;
+    const s3 = parseFloat(document.getElementById('s3').value) || 0;
+    const rates = getRates();
+
+    const s12 = s1 + s2;
+    const years = targetYear - baseYear;
+
+    if (s12 <= 0) {
+      document.getElementById('rv').innerHTML = '<span class="gc-empty">Enter Scope 1 + 2</span>';
+      document.getElementById('ru').textContent = '';
+      document.getElementById('breakdown').style.display = 'none';
+      document.getElementById('materialityPill').innerHTML = '';
+      document.getElementById('warnings').style.display = 'none';
+      document.getElementById('traj').style.display = 'none';
+      document.getElementById('insight').style.display = 'none';
+      return;
+    }
+
+    // ACA: target = base × (1 − rate)^years
+    const f12 = Math.pow(1 - rates.r12 / 100, years);
+    const f3  = Math.pow(1 - rates.r3  / 100, years);
+    const target12 = s12 * f12;
+    const target3  = s3 * f3;
+    const cut12 = (1 - f12) * 100;
+    const cut3  = (1 - f3)  * 100;
+
+    // Scope 3 materiality
+    const totalBase = s1 + s2 + s3;
+    const matPct = totalBase > 0 ? (s3 / totalBase) * 100 : 0;
+    const s3Required = s3 > 0 && matPct >= MATERIALITY;
+
+    // Net-zero reference
+    const netZero = s12 * (1 - NET_ZERO_CUT);
+
+    // --- Render hero ---
+    document.getElementById('rv').textContent = fmtT(target12);
+    document.getElementById('ru').textContent = 'tCO₂e by ' + targetYear + '  (from ' + fmtT(s12) + ' tCO₂e base)';
+
+    // --- Breakdown ---
+    document.getElementById('bd-window').textContent = baseYear + ' → ' + targetYear + '  (' + years + ' yrs)';
+    document.getElementById('bd-cut12').textContent = '−' + fmt(cut12) + '%';
+    document.getElementById('bd-s3target').textContent = s3 > 0 ? fmtT(target3) + ' tCO₂e' : 'n/a';
+    document.getElementById('bd-cut3').textContent = s3 > 0 ? '−' + fmt(cut3) + '%' : 'n/a';
+    document.getElementById('bd-mat').textContent = s3 > 0 ? fmt(matPct) + '%' : 'no Scope 3 entered';
+    document.getElementById('bd-nz').textContent = fmtT(netZero) + ' tCO₂e  (−90%)';
+    document.getElementById('breakdown').style.display = 'block';
+
+    // --- Materiality pill ---
+    const pill = document.getElementById('materialityPill');
+    if (s3 > 0) {
+      pill.innerHTML = s3Required
+        ? '<span class="gc-pill req">Scope 3 target REQUIRED — ' + fmt(matPct) + '% ≥ 40% · cover ≥ 67%</span>'
+        : '<span class="gc-pill ok">Scope 3 target optional — ' + fmt(matPct) + '% &lt; 40% threshold</span>';
+    } else {
+      pill.innerHTML = '';
+    }
+
+    // --- Validation warnings ---
+    const warns = [];
+    if (rates.r12 < FLOOR_12) {
+      warns.push('<strong>Scope 1+2 rate below floor.</strong> ' + rates.r12 + '%/yr is under the SBTi 1.5°C minimum of ' + FLOOR_12 + '%/yr — this target would not validate.');
+    }
+    if (s3Required && rates.r3 < FLOOR_3) {
+      warns.push('<strong>Scope 3 rate below floor.</strong> ' + rates.r3 + '%/yr is under the ' + FLOOR_3 + '%/yr minimum that applies when a Scope 3 target is required.');
+    }
+    if (years < 5 || years > 10) {
+      warns.push('<strong>Target year out of window.</strong> SBTi near-term targets must be 5–10 years from the submission year (' + SUBMISSION_YEAR + ').');
+    }
+    if (s3Required) {
+      warns.push('<strong>Scope 3 coverage.</strong> Because Scope 3 is material (≥ 40%), your target must cover at least 67% of total screened Scope 3 emissions.');
+    }
+    const wEl = document.getElementById('warnings');
+    if (warns.length) {
+      wEl.innerHTML = warns.map(w => '<div class="gc-warn-item">' + w + '</div>').join('');
+      wEl.style.display = 'block';
+    } else {
+      wEl.innerHTML = '<div class="gc-warn-item" style="background:rgba(4,191,98,0.08);border-left-color:var(--c-action);"><strong style="color:var(--c-action)">Meets the 1.5°C floor.</strong> Rates and window are within SBTi near-term criteria.</div>';
+      wEl.style.display = 'block';
+    }
+
+    // --- Trajectory table ---
+    const body = document.getElementById('trajBody');
+    body.innerHTML = '';
+    const showS3 = s3 > 0;
+    document.getElementById('th-s3').style.display = showS3 ? '' : 'none';
+    document.getElementById('th-s3cut').style.display = showS3 ? '' : 'none';
+    for (let y = baseYear; y <= targetYear; y++) {
+      const n = y - baseYear;
+      const e12 = s12 * Math.pow(1 - rates.r12 / 100, n);
+      const c12 = (1 - Math.pow(1 - rates.r12 / 100, n)) * 100;
+      const e3  = s3  * Math.pow(1 - rates.r3  / 100, n);
+      const c3  = (1 - Math.pow(1 - rates.r3  / 100, n)) * 100;
+      const tr = document.createElement('tr');
+      if (y === baseYear)   tr.className = 'is-base';
+      if (y === targetYear) tr.className = 'is-target';
+      let html = '<td>' + y + (y === baseYear ? ' · base' : (y === targetYear ? ' · target' : '')) + '</td>'
+               + '<td>' + fmtT(e12) + '</td>'
+               + '<td class="col-cut">−' + fmt(c12) + '%</td>';
+      if (showS3) {
+        html += '<td>' + fmtT(e3) + '</td>'
+              + '<td class="col-cut">−' + fmt(c3) + '%</td>';
+      }
+      tr.innerHTML = html;
+      body.appendChild(tr);
+    }
+    document.getElementById('traj').style.display = 'block';
+    document.getElementById('insight').style.display = 'block';
+  }
+</script>
+</body>
+</html>

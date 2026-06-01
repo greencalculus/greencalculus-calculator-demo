@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FLAG Emissions Calculator — GreenCalculus</title>
+<meta name="description" content="Calculate Forest, Land &amp; Agriculture (FLAG) emissions: land-use change, land management, and carbon removals as three separate lines per the GHG Protocol Land Sector Standard, with an SBTi FLAG 20% eligibility check. Free demo by GreenCalculus.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --c-action: #04BF62;
+    --c-action-dark: #03a554;
+    --c-luc: #D4860B;      /* land use change */
+    --c-lm: #E05252;       /* land management */
+    --c-removal: #04BF62;  /* removals */
+    --c-bg: #0f1a0d;
+    --c-surface: #1a2e17;
+    --c-surface-2: #213820;
+    --c-border: rgba(4,191,98,0.15);
+    --c-text: #e8f5e2;
+    --c-muted: #7a9b72;
+    --c-mono: #a8d4a0;
+    --radius: 10px;
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--c-bg);
+    color: var(--c-text);
+    min-height: 100vh;
+    padding: clamp(1rem, 4vw, 2rem);
+  }
+
+  .gc-wrap { max-width: 960px; margin-inline: auto; }
+
+  .gc-nav {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.78rem; font-family: var(--font-mono);
+    color: var(--c-muted); margin-block-end: 1.5rem;
+  }
+  .gc-nav a { color: var(--c-action); text-decoration: none; }
+  .gc-nav a:hover { text-decoration: underline; }
+
+  .gc-header {
+    margin-block-end: 2rem; padding-block-end: 1.5rem;
+    border-bottom: 1px solid var(--c-border);
+  }
+  .gc-wordmark {
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--c-action); margin-block-end: 0.5rem;
+  }
+  .gc-wordmark a { color: inherit; text-decoration: none; }
+  .gc-header h1 {
+    font-size: clamp(1.25rem, 3vw, 1.75rem); font-weight: 600;
+    line-height: 1.2; margin-block-end: 0.5rem;
+  }
+  .gc-header p { font-size: 0.9rem; color: var(--c-muted); line-height: 1.6; }
+  .gc-badges { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-start: 0.75rem; }
+  .gc-badge {
+    font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem;
+    border-radius: 4px; background: var(--c-surface-2);
+    border: 1px solid var(--c-border); color: var(--c-mono);
+  }
+
+  .gc-calc { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+  @media (max-width: 760px) { .gc-calc { grid-template-columns: 1fr; } }
+
+  .gc-panel {
+    background: var(--c-surface); border: 1px solid var(--c-border);
+    border-radius: var(--radius); padding: 1.5rem;
+  }
+  .gc-panel > h2 {
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--c-muted); margin-block-end: 1.25rem;
+  }
+
+  /* Section group */
+  .gc-section { margin-block-end: 1.5rem; }
+  .gc-section-hdr {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.78rem; font-weight: 600; letter-spacing: 0.04em;
+    margin-block-end: 0.85rem; padding-block-end: 0.5rem;
+    border-bottom: 1px solid var(--c-border);
+  }
+  .gc-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+
+  .gc-field { margin-block-end: 1rem; }
+  .gc-field label {
+    display: block; font-size: 0.8rem; font-weight: 500;
+    color: var(--c-muted); margin-block-end: 0.4rem;
+  }
+  .gc-field select, .gc-field input {
+    width: 100%; padding: 0.55rem 0.8rem; background: var(--c-surface-2);
+    border: 1px solid var(--c-border); border-radius: 6px; color: var(--c-text);
+    font-family: var(--font-mono); font-size: 0.88rem; appearance: none;
+    transition: border-color 0.15s;
+  }
+  .gc-field select:focus, .gc-field input:focus { outline: none; border-color: var(--c-action); }
+  .gc-field .gc-unit { font-size: 0.72rem; color: var(--c-muted); margin-block-start: 0.3rem; font-family: var(--font-mono); }
+  .gc-two { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+
+  /* Inline labelled number rows (livestock / forestry) */
+  .gc-inrow {
+    display: grid; grid-template-columns: 1fr auto; gap: 0.6rem;
+    align-items: center; margin-block-end: 0.55rem;
+  }
+  .gc-inrow label { font-size: 0.8rem; color: var(--c-text); margin: 0; }
+  .gc-inrow small { display: block; font-size: 0.68rem; color: var(--c-muted); font-family: var(--font-mono); }
+  .gc-inrow input {
+    width: 110px; padding: 0.45rem 0.6rem; background: var(--c-surface-2);
+    border: 1px solid var(--c-border); border-radius: 6px; color: var(--c-text);
+    font-family: var(--font-mono); font-size: 0.85rem; text-align: right;
+  }
+  .gc-inrow input:focus { outline: none; border-color: var(--c-action); }
+
+  .gc-btn {
+    width: 100%; padding: 0.8rem; background: var(--c-action); color: #0f1a0d;
+    border: none; border-radius: 6px; font-family: var(--font-sans);
+    font-size: 0.95rem; font-weight: 600; cursor: pointer;
+    transition: background 0.15s; margin-block-start: 0.5rem;
+  }
+  .gc-btn:hover { background: var(--c-action-dark); }
+
+  /* Hero cells */
+  .gc-hero-grid { display: grid; gap: 0.75rem; margin-block-end: 1.25rem; }
+  .gc-hero-cell {
+    padding: 1.1rem 1.25rem; background: var(--c-surface-2);
+    border-radius: var(--radius); border: 1px solid var(--c-border); border-left-width: 3px;
+  }
+  .gc-hero-cell.gross   { border-left-color: var(--c-lm); }
+  .gc-hero-cell.removal { border-left-color: var(--c-removal); }
+  .gc-hero-cell.net     { border-left-color: var(--c-muted); }
+  .gc-hero-label {
+    font-size: 0.7rem; color: var(--c-muted); letter-spacing: 0.06em;
+    text-transform: uppercase; margin-block-end: 0.35rem;
+  }
+  .gc-hero-value {
+    font-family: var(--font-mono); font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 500; color: var(--c-text); font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .gc-hero-cell.gross   .gc-hero-value { color: var(--c-lm); }
+  .gc-hero-cell.removal .gc-hero-value { color: var(--c-removal); }
+  .gc-hero-sub { font-family: var(--font-mono); font-size: 0.72rem; color: var(--c-muted); margin-block-start: 0.35rem; }
+
+  /* Composition bar */
+  .gc-bar { display: flex; height: 12px; border-radius: 6px; overflow: hidden; margin-block: 1rem 0.5rem; background: var(--c-surface-2); }
+  .gc-bar span { height: 100%; display: block; }
+  .gc-bar-legend { display: flex; flex-wrap: wrap; gap: 0.75rem; font-size: 0.72rem; color: var(--c-muted); }
+  .gc-bar-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 0.35rem; vertical-align: middle; }
+
+  .gc-breakdown { border-top: 1px solid var(--c-border); padding-block-start: 1rem; margin-block-start: 1rem; }
+  .gc-breakdown h3 {
+    font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--c-muted); margin-block-end: 0.75rem;
+  }
+  .gc-breakdown-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-block: 0.3rem; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.8rem; gap: 1rem;
+  }
+  .gc-breakdown-row:last-child { border-bottom: none; }
+  .gc-breakdown-key { color: var(--c-muted); }
+  .gc-breakdown-val { font-family: var(--font-mono); font-size: 0.8rem; font-variant-numeric: tabular-nums; color: var(--c-text); text-align: right; }
+  .gc-breakdown-val.rem { color: var(--c-removal); }
+
+  .gc-empty { font-family: var(--font-mono); font-size: 1.1rem; color: var(--c-muted); text-align: center; padding: 2rem 0; }
+
+  /* Warnings / notices */
+  .gc-notice {
+    margin-block-start: 1.1rem; padding: 0.8rem 1rem;
+    border-left: 3px solid var(--c-luc); background: rgba(212,134,11,0.08);
+    border-radius: 0 6px 6px 0; font-size: 0.8rem; line-height: 1.5; color: var(--c-text);
+  }
+  .gc-notice strong { color: var(--c-luc); }
+  .gc-pill {
+    display: inline-block; font-family: var(--font-mono); font-size: 0.72rem;
+    padding: 0.18rem 0.6rem; border-radius: 4px; margin-block-start: 0.6rem;
+  }
+  .gc-pill.req { background: rgba(212,134,11,0.15); color: var(--c-luc); border: 1px solid rgba(212,134,11,0.4); }
+  .gc-pill.ok  { background: rgba(4,191,98,0.12); color: var(--c-action); border: 1px solid var(--c-border); }
+
+  .gc-insight {
+    margin-block-start: 1.5rem; padding: 1rem 1.25rem; background: var(--c-surface);
+    border-left: 3px solid var(--c-action); border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 0.85rem; color: var(--c-muted); line-height: 1.6;
+  }
+  .gc-insight strong { color: var(--c-text); }
+
+  .gc-footer {
+    margin-block-start: 2.5rem; padding-block-start: 1.5rem; border-top: 1px solid var(--c-border);
+    font-size: 0.78rem; color: var(--c-muted); display: flex; flex-wrap: wrap;
+    gap: 0.5rem 1.5rem; align-items: center; line-height: 1.7;
+  }
+  .gc-footer a { color: var(--c-action); text-decoration: none; }
+  .gc-footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="gc-wrap">
+
+  <nav class="gc-nav">
+    <a href="./index.html">← All calculators</a>
+    <span>/</span>
+    <span>FLAG Emissions</span>
+  </nav>
+
+  <header class="gc-header">
+    <div class="gc-wordmark"><a href="https://greencalculus.com">GreenCalculus</a></div>
+    <h1>FLAG Emissions Calculator</h1>
+    <p>Forest, Land &amp; Agriculture emissions across three pillars — <strong>Land Use Change</strong>,
+       <strong>Land Management</strong>, and <strong>Carbon Removals</strong> — reported as separate
+       lines per the GHG Protocol Land Sector &amp; Removals Standard. Removals are never netted
+       against gross emissions for target-setting.</p>
+    <div class="gc-badges">
+      <span class="gc-badge">GHG Protocol Land Sector</span>
+      <span class="gc-badge">SBTi FLAG</span>
+      <span class="gc-badge">IPCC AR6 Tier 1</span>
+      <span class="gc-badge">Vanilla JS</span>
+    </div>
+  </header>
+
+  <div class="gc-calc">
+
+    <!-- INPUTS -->
+    <div class="gc-panel">
+      <h2>Inputs</h2>
+
+      <!-- A · LUC -->
+      <div class="gc-section">
+        <div class="gc-section-hdr"><span class="gc-dot" style="background:var(--c-luc)"></span> A · Land Use Change</div>
+        <div class="gc-field">
+          <label for="lucType">LUC type</label>
+          <select id="lucType" onchange="onLucChange()">
+            <option value="none">None — no land use change</option>
+            <option value="tropical">Tropical deforestation (165 tCO₂e/ha, one-time)</option>
+            <option value="temperate">Temperate deforestation (90 tCO₂e/ha, one-time)</option>
+            <option value="peatland">Peatland drainage (27 tCO₂e/ha/yr, ongoing)</option>
+          </select>
+        </div>
+        <div class="gc-two" id="lucDetail" style="display:none;">
+          <div class="gc-field">
+            <label for="lucHa">Hectares affected</label>
+            <input type="number" id="lucHa" min="0" step="any" placeholder="0">
+            <div class="gc-unit">ha</div>
+          </div>
+          <div class="gc-field" id="lucAmortField">
+            <label for="lucAmort">Amortisation</label>
+            <select id="lucAmort">
+              <option value="20">20-yr annualised (÷20)</option>
+              <option value="1">One-time event</option>
+            </select>
+            <div class="gc-unit">deforestation only</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- B · Land management -->
+      <div class="gc-section">
+        <div class="gc-section-hdr"><span class="gc-dot" style="background:var(--c-lm)"></span> B · Land Management (annual)</div>
+
+        <label style="font-size:0.78rem;color:var(--c-muted);display:block;margin-block-end:0.5rem;">B1 · Livestock (head count)</label>
+        <div class="gc-inrow"><div><label>Dairy cattle</label><small>145 kg CO₂e/head/yr</small></div><input type="number" id="lvDairy" min="0" step="1" placeholder="0"></div>
+        <div class="gc-inrow"><div><label>Beef cattle</label><small>70 kg CO₂e/head/yr</small></div><input type="number" id="lvBeef" min="0" step="1" placeholder="0"></div>
+        <div class="gc-inrow"><div><label>Sheep</label><small>9.4 kg CO₂e/head/yr</small></div><input type="number" id="lvSheep" min="0" step="1" placeholder="0"></div>
+        <div class="gc-inrow"><div><label>Pigs</label><small>12.3 kg CO₂e/head/yr</small></div><input type="number" id="lvPigs" min="0" step="1" placeholder="0"></div>
+        <div class="gc-inrow"><div><label>Poultry</label><small>0.6 kg CO₂e/head/yr</small></div><input type="number" id="lvPoultry" min="0" step="1" placeholder="0"></div>
+
+        <label style="font-size:0.78rem;color:var(--c-muted);display:block;margin:1rem 0 0.5rem;">B2 · Nitrogen fertiliser <small style="font-family:var(--font-mono)">(kg N element)</small></label>
+        <div class="gc-two">
+          <div class="gc-field"><label for="synthN">Synthetic N</label><input type="number" id="synthN" min="0" step="any" placeholder="0"><div class="gc-unit">kg N/yr · 5.765 ×</div></div>
+          <div class="gc-field"><label for="orgN">Organic N</label><input type="number" id="orgN" min="0" step="any" placeholder="0"><div class="gc-unit">kg N/yr · 5.765 ×</div></div>
+        </div>
+
+        <label style="font-size:0.78rem;color:var(--c-muted);display:block;margin:0.5rem 0;">B3 · Other (hectares)</label>
+        <div class="gc-inrow"><div><label>Rice cultivation</label><small>1,210 kg CO₂e/ha/yr</small></div><input type="number" id="riceHa" min="0" step="any" placeholder="0"></div>
+        <div class="gc-inrow"><div><label>Crop residue burned</label><small>2,860 kg CO₂e/ha</small></div><input type="number" id="burnHa" min="0" step="any" placeholder="0"></div>
+      </div>
+
+      <!-- C · Removals -->
+      <div class="gc-section">
+        <div class="gc-section-hdr"><span class="gc-dot" style="background:var(--c-removal)"></span> C · Carbon Removals (annual)</div>
+        <label style="font-size:0.78rem;color:var(--c-muted);display:block;margin-block-end:0.5rem;">C1 · Forestry sequestration (ha)</label>
+        <div class="gc-inrow"><div><label>Tropical</label><small>−11,000 kg CO₂e/ha/yr</small></div><input type="number" id="fTropical" min="0" step="any" placeholder="0"></div>
+        <div class="gc-inrow"><div><label>Temperate broadleaf</label><small>−5,800 kg CO₂e/ha/yr</small></div><input type="number" id="fBroadleaf" min="0" step="any" placeholder="0"></div>
+        <div class="gc-inrow"><div><label>Temperate conifer</label><small>−4,900 kg CO₂e/ha/yr</small></div><input type="number" id="fConifer" min="0" step="any" placeholder="0"></div>
+        <div class="gc-inrow"><div><label>Boreal</label><small>−2,200 kg CO₂e/ha/yr</small></div><input type="number" id="fBoreal" min="0" step="any" placeholder="0"></div>
+
+        <label style="font-size:0.78rem;color:var(--c-muted);display:block;margin:1rem 0 0.5rem;">C2 · Soil carbon (ha)</label>
+        <div class="gc-inrow"><div><label>Improved grassland</label><small>−500 kg CO₂e/ha/yr</small></div><input type="number" id="sGrass" min="0" step="any" placeholder="0"></div>
+        <div class="gc-inrow"><div><label>Cover cropping</label><small>−300 kg CO₂e/ha/yr</small></div><input type="number" id="sCover" min="0" step="any" placeholder="0"></div>
+      </div>
+
+      <!-- SBTi FLAG eligibility -->
+      <div class="gc-section">
+        <div class="gc-section-hdr"><span class="gc-dot" style="background:var(--c-mono)"></span> SBTi FLAG eligibility check</div>
+        <div class="gc-field">
+          <label for="totalInv">Total company GHG inventory <small style="font-family:var(--font-mono)">(optional)</small></label>
+          <input type="number" id="totalInv" min="0" step="any" placeholder="e.g. 12500">
+          <div class="gc-unit">tCO₂e/yr · all scopes. FLAG &gt; 20% → target required.</div>
+        </div>
+      </div>
+
+      <button class="gc-btn" onclick="calculate()">Calculate FLAG Emissions</button>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="gc-panel">
+      <h2>Results</h2>
+
+      <div id="idle" class="gc-empty">🌿 Enter at least one input</div>
+
+      <div id="results" style="display:none;">
+        <div class="gc-hero-grid">
+          <div class="gc-hero-cell gross">
+            <div class="gc-hero-label">Gross FLAG emissions</div>
+            <div class="gc-hero-value" id="hvGross">—</div>
+            <div class="gc-hero-sub">tCO₂e · Land Use Change + Land Management</div>
+          </div>
+          <div class="gc-hero-cell removal">
+            <div class="gc-hero-label">Carbon removals (separate)</div>
+            <div class="gc-hero-value" id="hvRem">—</div>
+            <div class="gc-hero-sub">tCO₂e · reported separately, never offsetting</div>
+          </div>
+          <div class="gc-hero-cell net">
+            <div class="gc-hero-label">Net FLAG position</div>
+            <div class="gc-hero-value" id="hvNet">—</div>
+            <div class="gc-hero-sub">tCO₂e · gross − removals (informational only)</div>
+          </div>
+        </div>
+
+        <div class="gc-bar" id="compBar"></div>
+        <div class="gc-bar-legend">
+          <span><i style="background:var(--c-luc)"></i>Land Use Change</span>
+          <span><i style="background:var(--c-lm)"></i>Land Management</span>
+        </div>
+
+        <div class="gc-breakdown">
+          <h3>Pillar breakdown</h3>
+          <div class="gc-breakdown-row"><span class="gc-breakdown-key">A · Land Use Change</span><span class="gc-breakdown-val" id="bdLuc">—</span></div>
+          <div class="gc-breakdown-row"><span class="gc-breakdown-key">B · Land Management</span><span class="gc-breakdown-val" id="bdLm">—</span></div>
+          <div class="gc-breakdown-row"><span class="gc-breakdown-key">&nbsp;&nbsp;↳ Livestock</span><span class="gc-breakdown-val" id="bdLivestock">—</span></div>
+          <div class="gc-breakdown-row"><span class="gc-breakdown-key">&nbsp;&nbsp;↳ Fertiliser</span><span class="gc-breakdown-val" id="bdFert">—</span></div>
+          <div class="gc-breakdown-row"><span class="gc-breakdown-key">&nbsp;&nbsp;↳ Rice + burning</span><span class="gc-breakdown-val" id="bdOther">—</span></div>
+          <div class="gc-breakdown-row"><span class="gc-breakdown-key">C · Removals</span><span class="gc-breakdown-val rem" id="bdRem">—</span></div>
+          <div class="gc-breakdown-row"><span class="gc-breakdown-key">GWP basis</span><span class="gc-breakdown-val">IPCC AR6 GWP-100</span></div>
+        </div>
+
+        <div id="sbtiPill"></div>
+
+        <div class="gc-notice" style="border-left-color:var(--c-removal);background:rgba(4,191,98,0.07);">
+          <strong style="color:var(--c-removal)">Removals are separate.</strong>
+          Per GHG Protocol Land Sector Standard §9, sequestration must <strong style="color:var(--c-text)">not</strong>
+          be netted against gross emissions for target-setting. The net figure above is informational only.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gc-insight">
+    <strong>Why three separate lines?</strong>
+    FLAG accounting keeps <em>land-use change</em> (one-time carbon stock loss from deforestation,
+    commonly amortised over 20 years), <em>land management</em> (recurring biogenic CH₄ and N₂O from
+    livestock, fertiliser, rice, and burning), and <em>removals</em> (sequestration in forests and soils)
+    on distinct inventory lines. Under <strong>SBTi FLAG</strong>, if your land-sector emissions exceed
+    <strong>20% of your total GHG inventory</strong>, a separate science-based FLAG target is required.
+  </div>
+
+  <footer class="gc-footer">
+    <span>Live version: <a href="https://greencalculus.com/calculators/flag-emissions-calculator/">Open the full calculator on GreenCalculus.com ↗</a></span>
+    <span>Methodology: <a href="https://github.com/greencalculus/greencalculus-methodology">greencalculus-methodology</a></span>
+    <span>Standard: GHG Protocol Land Sector &amp; Removals Standard (2026) · SBTi FLAG · IPCC AR6 Tier 1</span>
+  </footer>
+
+</div>
+
+<script>
+  // Land management factors (kg CO₂e per head/yr or per ha/yr).
+  const LIVESTOCK = { lvDairy: 145.0, lvBeef: 70.0, lvSheep: 9.4, lvPigs: 12.3, lvPoultry: 0.6 };
+  const N_FACTOR = 5.765;        // kg CO₂e per kg N (synthetic + organic, DEFRA 2025 + indirect N₂O)
+  const RICE = 1210.0;           // kg CO₂e/ha/yr
+  const BURN = 2860.0;           // kg CO₂e/ha (one event/yr)
+  // Land-use change (kg CO₂e/ha; deforestation is one-time stock loss).
+  const LUC = { tropical: 165000.0, temperate: 90000.0, peatland: 27000.0 };
+  // Removals (negative kg CO₂e/ha/yr).
+  const FORESTRY = { fTropical: -11000.0, fBroadleaf: -5800.0, fConifer: -4900.0, fBoreal: -2200.0 };
+  const SOIL = { sGrass: -500.0, sCover: -300.0 };
+  const SBTI_FLAG_THRESHOLD = 20; // % of total inventory
+
+  const val = (id) => parseFloat(document.getElementById(id).value) || 0;
+  const fmtT = (kg) => {
+    const t = kg / 1000;
+    return Math.abs(t) >= 1
+      ? t.toLocaleString(undefined, { maximumFractionDigits: 1 })
+      : t.toLocaleString(undefined, { maximumFractionDigits: 3 });
+  };
+
+  function onLucChange() {
+    const t = document.getElementById('lucType').value;
+    document.getElementById('lucDetail').style.display = t === 'none' ? 'none' : 'grid';
+    // Amortisation only applies to one-time deforestation, not ongoing peatland.
+    document.getElementById('lucAmortField').style.display = (t === 'tropical' || t === 'temperate') ? '' : 'none';
+  }
+
+  function calculate() {
+    // --- A · Land Use Change ---
+    const lucType = document.getElementById('lucType').value;
+    const lucHa = val('lucHa');
+    let lucKg = 0;
+    if (lucType !== 'none' && lucHa > 0) {
+      if (lucType === 'peatland') {
+        lucKg = lucHa * LUC.peatland;                       // annual ongoing
+      } else {
+        const amort = parseFloat(document.getElementById('lucAmort').value) || 1;
+        lucKg = (lucHa * LUC[lucType]) / amort;             // one-time stock loss, optionally /20
+      }
+    }
+
+    // --- B · Land Management ---
+    let liveKg = 0;
+    for (const id in LIVESTOCK) liveKg += val(id) * LIVESTOCK[id];
+    const fertKg = (val('synthN') + val('orgN')) * N_FACTOR;
+    const otherKg = val('riceHa') * RICE + val('burnHa') * BURN;
+    const lmKg = liveKg + fertKg + otherKg;
+
+    // --- C · Removals (negative) ---
+    let remKg = 0;
+    for (const id in FORESTRY) remKg += val(id) * FORESTRY[id];
+    for (const id in SOIL)     remKg += val(id) * SOIL[id];
+
+    const grossKg = lucKg + lmKg;
+    const removalsKg = Math.abs(remKg);     // magnitude of sequestration
+    const netKg = grossKg - removalsKg;     // informational only
+
+    if (grossKg === 0 && removalsKg === 0) {
+      document.getElementById('idle').style.display = 'block';
+      document.getElementById('results').style.display = 'none';
+      return;
+    }
+    document.getElementById('idle').style.display = 'none';
+    document.getElementById('results').style.display = 'block';
+
+    // --- Hero ---
+    document.getElementById('hvGross').textContent = fmtT(grossKg);
+    document.getElementById('hvRem').textContent = removalsKg > 0 ? '−' + fmtT(removalsKg) : '0';
+    document.getElementById('hvNet').textContent = fmtT(netKg);
+
+    // --- Composition bar (LUC vs LM share of gross) ---
+    const bar = document.getElementById('compBar');
+    if (grossKg > 0) {
+      const lucPct = (lucKg / grossKg) * 100;
+      const lmPct  = (lmKg  / grossKg) * 100;
+      bar.innerHTML = '<span style="width:' + lucPct + '%;background:var(--c-luc)"></span>'
+                    + '<span style="width:' + lmPct  + '%;background:var(--c-lm)"></span>';
+    } else {
+      bar.innerHTML = '';
+    }
+
+    // --- Breakdown ---
+    document.getElementById('bdLuc').textContent = fmtT(lucKg) + ' tCO₂e';
+    document.getElementById('bdLm').textContent = fmtT(lmKg) + ' tCO₂e';
+    document.getElementById('bdLivestock').textContent = fmtT(liveKg) + ' tCO₂e';
+    document.getElementById('bdFert').textContent = fmtT(fertKg) + ' tCO₂e';
+    document.getElementById('bdOther').textContent = fmtT(otherKg) + ' tCO₂e';
+    document.getElementById('bdRem').textContent = removalsKg > 0 ? '−' + fmtT(removalsKg) + ' tCO₂e' : '0';
+
+    // --- SBTi FLAG eligibility ---
+    const totalInv = val('totalInv');
+    const pillEl = document.getElementById('sbtiPill');
+    if (totalInv > 0) {
+      const grossT = grossKg / 1000;
+      const flagPct = (grossT / totalInv) * 100;
+      const required = flagPct > SBTI_FLAG_THRESHOLD;
+      pillEl.innerHTML = required
+        ? '<span class="gc-pill req">SBTi FLAG target REQUIRED — FLAG is ' + flagPct.toFixed(1) + '% of inventory (&gt; 20%)</span>'
+        : '<span class="gc-pill ok">SBTi FLAG target not triggered — FLAG is ' + flagPct.toFixed(1) + '% of inventory (≤ 20%)</span>';
+    } else {
+      pillEl.innerHTML = '';
+    }
+  }
+
+  onLucChange();
+</script>
+</body>
+</html>
