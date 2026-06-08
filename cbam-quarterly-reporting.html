@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBAM Quarterly Reporting Calculator — GreenCalculus</title>
+<meta name="description" content="Estimate the embedded emissions and CBAM certificate liability of EU imports across the six CBAM goods — cement, iron &amp; steel, aluminium, fertilisers, hydrogen, electricity — with the 2026–2034 phase-in and origin carbon-price rebate. Free demo by GreenCalculus.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --c-action: #04BF62;
+    --c-action-dark: #03a554;
+    --c-bg: #0f1a0d;
+    --c-surface: #1a2e17;
+    --c-surface-2: #213820;
+    --c-border: rgba(4,191,98,0.15);
+    --c-text: #e8f5e2;
+    --c-muted: #7a9b72;
+    --c-mono: #a8d4a0;
+    --c-cost: #D4860B;
+    --radius: 10px;
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans); background: var(--c-bg); color: var(--c-text);
+    min-height: 100vh; padding: clamp(1rem, 4vw, 2rem);
+  }
+  .gc-wrap { max-width: 960px; margin-inline: auto; }
+
+  .gc-nav {
+    display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem;
+    font-family: var(--font-mono); color: var(--c-muted); margin-block-end: 1.5rem;
+  }
+  .gc-nav a { color: var(--c-action); text-decoration: none; }
+  .gc-nav a:hover { text-decoration: underline; }
+
+  .gc-header { margin-block-end: 2rem; padding-block-end: 1.5rem; border-bottom: 1px solid var(--c-border); }
+  .gc-wordmark {
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--c-action); margin-block-end: 0.5rem;
+  }
+  .gc-wordmark a { color: inherit; text-decoration: none; }
+  .gc-header h1 { font-size: clamp(1.25rem, 3vw, 1.75rem); font-weight: 600; line-height: 1.2; margin-block-end: 0.5rem; }
+  .gc-header p { font-size: 0.9rem; color: var(--c-muted); line-height: 1.6; }
+  .gc-header code { font-family: var(--font-mono); color: var(--c-mono); font-size: 0.85em; }
+  .gc-badges { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-start: 0.75rem; }
+  .gc-badge {
+    font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px;
+    background: var(--c-surface-2); border: 1px solid var(--c-border); color: var(--c-mono);
+  }
+
+  .gc-calc { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+  @media (max-width: 760px) { .gc-calc { grid-template-columns: 1fr; } }
+
+  .gc-panel { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius); padding: 1.5rem; }
+  .gc-panel > h2 {
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--c-muted); margin-block-end: 1.25rem;
+  }
+
+  .gc-field { margin-block-end: 1.1rem; }
+  .gc-field label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--c-muted); margin-block-end: 0.4rem; }
+  .gc-field select, .gc-field input {
+    width: 100%; padding: 0.6rem 0.85rem; background: var(--c-surface-2);
+    border: 1px solid var(--c-border); border-radius: 6px; color: var(--c-text);
+    font-family: var(--font-mono); font-size: 0.9rem; appearance: none; transition: border-color 0.15s;
+  }
+  .gc-field select:focus, .gc-field input:focus { outline: none; border-color: var(--c-action); }
+  .gc-field .gc-unit { font-size: 0.73rem; color: var(--c-muted); margin-block-start: 0.3rem; font-family: var(--font-mono); }
+  .gc-two { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+
+  .gc-toggle { display: flex; gap: 0; border: 1px solid var(--c-border); border-radius: 6px; overflow: hidden; }
+  .gc-toggle button {
+    flex: 1; padding: 0.5rem; background: var(--c-surface-2); color: var(--c-muted);
+    border: none; font-family: var(--font-mono); font-size: 0.8rem; cursor: pointer; transition: 0.15s;
+  }
+  .gc-toggle button.is-active { background: var(--c-action); color: #0f1a0d; font-weight: 600; }
+
+  .gc-btn {
+    width: 100%; padding: 0.8rem; background: var(--c-action); color: #0f1a0d; border: none;
+    border-radius: 6px; font-family: var(--font-sans); font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; transition: background 0.15s; margin-block-start: 0.5rem;
+  }
+  .gc-btn:hover { background: var(--c-action-dark); }
+
+  .gc-result-primary {
+    text-align: center; padding: 1.5rem 1rem; background: var(--c-surface-2); border-radius: var(--radius);
+    margin-block-end: 1.1rem; border: 1px solid var(--c-border);
+  }
+  .gc-result-label { font-size: 0.72rem; color: var(--c-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-block-end: 0.5rem; }
+  .gc-result-value {
+    font-family: var(--font-mono); font-size: clamp(1.9rem, 5vw, 2.5rem); font-weight: 500;
+    color: var(--c-action); font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .gc-result-unit { font-family: var(--font-mono); font-size: 0.82rem; color: var(--c-muted); margin-block-start: 0.4rem; }
+
+  /* Liability strip */
+  .gc-liability {
+    display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
+    margin-block-end: 1.1rem; padding: 0.85rem 1rem; border-radius: var(--radius);
+    background: var(--c-surface-2); border: 1px solid var(--c-border);
+  }
+  .gc-liability-label { font-size: 0.78rem; color: var(--c-muted); line-height: 1.3; }
+  .gc-liability-label small { display: block; font-family: var(--font-mono); font-size: 0.7rem; }
+  .gc-liability-value { font-family: var(--font-mono); font-weight: 600; font-size: 1.15rem; color: var(--c-cost); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .gc-liability.is-report .gc-liability-value { color: var(--c-action); font-size: 0.95rem; }
+
+  .gc-breakdown { border-top: 1px solid var(--c-border); padding-block-start: 1rem; }
+  .gc-breakdown h3 { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-muted); margin-block-end: 0.75rem; }
+  .gc-breakdown-row {
+    display: flex; justify-content: space-between; align-items: center; padding-block: 0.35rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem; gap: 1rem;
+  }
+  .gc-breakdown-row:last-child { border-bottom: none; }
+  .gc-breakdown-key { color: var(--c-muted); }
+  .gc-breakdown-val { font-family: var(--font-mono); font-size: 0.82rem; font-variant-numeric: tabular-nums; color: var(--c-text); text-align: right; }
+  .gc-breakdown-val.pos { color: var(--c-action); }
+  .gc-breakdown-val.cost { color: var(--c-cost); }
+
+  .gc-empty { font-family: var(--font-mono); font-size: 1.1rem; color: var(--c-muted); text-align: center; padding: 2rem 0; }
+
+  .gc-livelink {
+    display: block; margin-block-start: 1.1rem; padding: 0.7rem 1rem; text-align: center;
+    border: 1px dashed var(--c-border); border-radius: 6px; font-size: 0.82rem;
+    color: var(--c-action); text-decoration: none; transition: 0.15s;
+  }
+  .gc-livelink:hover { border-color: var(--c-action); background: rgba(4,191,98,0.06); }
+
+  /* Hub directory */
+  .gc-hub { margin-block-start: 2.5rem; }
+  .gc-hub h2 { font-size: 0.9rem; font-weight: 600; margin-block-end: 0.4rem; }
+  .gc-hub > p { font-size: 0.85rem; color: var(--c-muted); margin-block-end: 1.25rem; line-height: 1.6; }
+  .gc-hub-group { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-action); margin: 1.25rem 0 0.6rem; }
+  .gc-hub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.6rem; }
+  .gc-spoke {
+    display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;
+    padding: 0.7rem 0.9rem; background: var(--c-surface); border: 1px solid var(--c-border);
+    border-radius: 8px; text-decoration: none; color: var(--c-text); font-size: 0.83rem; transition: 0.15s;
+  }
+  .gc-spoke:hover { border-color: rgba(4,191,98,0.4); transform: translateY(-1px); }
+  .gc-spoke .arr { color: var(--c-action); font-family: var(--font-mono); }
+
+  .gc-insight {
+    margin-block-start: 2.5rem; padding: 1rem 1.25rem; background: var(--c-surface);
+    border-left: 3px solid var(--c-action); border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 0.85rem; color: var(--c-muted); line-height: 1.6;
+  }
+  .gc-insight strong { color: var(--c-text); }
+  .gc-insight code { font-family: var(--font-mono); color: var(--c-mono); font-size: 0.85em; }
+
+  .gc-footer {
+    margin-block-start: 2.5rem; padding-block-start: 1.5rem; border-top: 1px solid var(--c-border);
+    font-size: 0.78rem; color: var(--c-muted); display: flex; flex-wrap: wrap;
+    gap: 0.5rem 1.5rem; align-items: center; line-height: 1.7;
+  }
+  .gc-footer a { color: var(--c-action); text-decoration: none; }
+  .gc-footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="gc-wrap">
+
+  <nav class="gc-nav">
+    <a href="./index.html">← All calculators</a>
+    <span>/</span>
+    <span>CBAM Quarterly Reporting</span>
+  </nav>
+
+  <header class="gc-header">
+    <div class="gc-wordmark"><a href="https://greencalculus.com">GreenCalculus</a></div>
+    <h1>CBAM Quarterly Reporting Calculator</h1>
+    <p>The EU Carbon Border Adjustment Mechanism prices the carbon embedded in imported goods. The core is
+       one line — <code>embedded emissions = quantity × (direct + indirect intensity)</code> — but the
+       <strong>certificate liability</strong> then layers on the 2026–2034 phase-in and a rebate for any
+       carbon price already paid at origin. Pick a CBAM good, get the embedded tCO₂e, the certificates due,
+       and the euro cost, then jump to the full reporting tool.</p>
+    <div class="gc-badges">
+      <span class="gc-badge">Regulation (EU) 2023/956</span>
+      <span class="gc-badge">6 CBAM goods</span>
+      <span class="gc-badge">2026–2034 phase-in</span>
+      <span class="gc-badge">Vanilla JS</span>
+    </div>
+  </header>
+
+  <div class="gc-calc">
+
+    <!-- INPUTS -->
+    <div class="gc-panel">
+      <h2>Inputs</h2>
+
+      <div class="gc-field">
+        <label id="lblPeriod">Reporting period</label>
+        <div class="gc-toggle" id="period">
+          <button type="button" data-period="transitional" class="is-active">Transitional (report only)</button>
+          <button type="button" data-period="definitive">Definitive (certificates)</button>
+        </div>
+        <div class="gc-unit" id="periodNote">Quarterly reports — embedded emissions only, no payment until 2026.</div>
+      </div>
+
+      <div class="gc-field" id="yearWrap" style="display:none;">
+        <label for="year">Compliance year</label>
+        <select id="year"></select>
+        <div class="gc-unit" id="yearNote"></div>
+      </div>
+
+      <div class="gc-field">
+        <label for="good">CBAM good</label>
+        <select id="good" onchange="onGoodChange()"></select>
+        <div class="gc-unit" id="goodNote"></div>
+      </div>
+
+      <div class="gc-field">
+        <label id="lblQty" for="qty">Quantity imported this quarter</label>
+        <input type="number" id="qty" min="0" step="any" placeholder="0">
+        <div class="gc-unit" id="unitQty">tonnes</div>
+      </div>
+
+      <div class="gc-field">
+        <label id="lblBasis">Embedded-emissions basis</label>
+        <div class="gc-toggle" id="basis">
+          <button type="button" data-actual="false" class="is-active">Default values</button>
+          <button type="button" data-actual="true">Actual (verified)</button>
+        </div>
+        <div class="gc-unit" id="basisNote">Commission default values until verified installation data is available.</div>
+      </div>
+
+      <div class="gc-two" id="actualWrap" style="display:none;">
+        <div class="gc-field">
+          <label id="lblDirect" for="direct">Direct intensity</label>
+          <input type="number" id="direct" min="0" step="any" placeholder="0">
+          <div class="gc-unit">tCO₂e per unit</div>
+        </div>
+        <div class="gc-field">
+          <label id="lblIndirect" for="indirect">Indirect intensity</label>
+          <input type="number" id="indirect" min="0" step="any" placeholder="0">
+          <div class="gc-unit">tCO₂e per unit</div>
+        </div>
+      </div>
+
+      <div class="gc-two">
+        <div class="gc-field">
+          <label for="origin">Carbon price paid at origin</label>
+          <input type="number" id="origin" min="0" step="any" placeholder="0">
+          <div class="gc-unit">€ / tCO₂e — deductible</div>
+        </div>
+        <div class="gc-field">
+          <label for="ets">EU ETS certificate price</label>
+          <input type="number" id="ets" min="0" step="any" value="72">
+          <div class="gc-unit">€ / tCO₂e — weekly average</div>
+        </div>
+      </div>
+
+      <button class="gc-btn" onclick="calculate()">Calculate CBAM Liability</button>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="gc-panel">
+      <h2>Results</h2>
+
+      <div class="gc-result-primary">
+        <div class="gc-result-label">Embedded emissions</div>
+        <div class="gc-result-value" id="rv"><span class="gc-empty">—</span></div>
+        <div class="gc-result-unit" id="ru"></div>
+      </div>
+
+      <div class="gc-liability" id="liabBox" style="display:none;">
+        <span class="gc-liability-label" id="liabLabel">CBAM certificates due<small id="liabSub"></small></span>
+        <span class="gc-liability-value" id="liabValue">—</span>
+      </div>
+
+      <div class="gc-breakdown" id="breakdown" style="display:none;">
+        <h3>Calculation breakdown</h3>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">CBAM good</span><span class="gc-breakdown-val" id="bd-good">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Direct emissions</span><span class="gc-breakdown-val" id="bd-direct">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Indirect emissions</span><span class="gc-breakdown-val" id="bd-indirect">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Total embedded</span><span class="gc-breakdown-val pos" id="bd-total">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">CBAM phase-in factor</span><span class="gc-breakdown-val" id="bd-phase">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Origin carbon-price rebate</span><span class="gc-breakdown-val" id="bd-rebate">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Certificates to surrender</span><span class="gc-breakdown-val" id="bd-certs">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Liability</span><span class="gc-breakdown-val cost" id="bd-cost">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Regulation</span><span class="gc-breakdown-val">EU 2023/956</span></div>
+      </div>
+
+      <a class="gc-livelink" id="liveLink" href="https://greencalculus.com/calculators/cbam-quarterly-reporting-calculator/" style="display:none;">Open the full CBAM reporting tool on GreenCalculus.com ↗</a>
+    </div>
+  </div>
+
+  <!-- HUB DIRECTORY -->
+  <section class="gc-hub">
+    <h2>The climate disclosure &amp; compliance suite</h2>
+    <p>CBAM is one of a family of mandatory climate-reporting regimes. Each calculator below runs the full
+       methodology on GreenCalculus.com — with structured disclosures, schema-aligned exports, and
+       jurisdiction-specific rules.</p>
+
+    <div class="gc-hub-group">EU mechanisms</div>
+    <div class="gc-hub-grid" id="hubEU"></div>
+
+    <div class="gc-hub-group">Global standards</div>
+    <div class="gc-hub-grid" id="hubGlobal"></div>
+
+    <div class="gc-hub-group">National &amp; state mandates</div>
+    <div class="gc-hub-grid" id="hubNational"></div>
+  </section>
+
+  <div class="gc-insight">
+    <strong>Why the cost lags the emissions:</strong>
+    During the transitional period (Oct 2023 – Dec 2025) importers file a <em>quarterly CBAM report</em> of
+    embedded emissions with <strong>no financial liability</strong>. From 2026 the definitive regime begins,
+    but obligations phase in as EU ETS free allocation phases out — only <code>2.5%</code> of embedded
+    emissions need certificates in 2026, rising to <code>100%</code> by 2034. A carbon price already paid in
+    the country of production is deductible, so <code>certificates = embedded × phase-in × (1 − origin price ÷ ETS price)</code>.
+    Default values are illustrative — the live tool uses the Commission's published default-value tables per
+    good and country.
+  </div>
+
+  <footer class="gc-footer">
+    <span>Live tool: <a href="https://greencalculus.com/calculators/cbam-quarterly-reporting-calculator/">CBAM calculator on GreenCalculus.com ↗</a></span>
+    <span>Methodology: <a href="https://github.com/greencalculus/greencalculus-methodology">greencalculus-methodology</a></span>
+    <span>Regulation: (EU) 2023/956 — Carbon Border Adjustment Mechanism</span>
+  </footer>
+
+</div>
+
+<script>
+  const LIVE_BASE = 'https://greencalculus.com/calculators/';
+
+  // Six CBAM goods. Intensities are illustrative default values (tCO2e per unit), split direct / indirect.
+  // The live tool uses the Commission's official default-value tables per good and country of origin.
+  const GOODS = {
+    cement:      { label: 'Cement (clinker & cement)', unit: 't',   direct: 0.83, indirect: 0.05, note: 'CN 2523 — process CO₂ from calcination dominates.' },
+    iron_steel:  { label: 'Iron & Steel',              unit: 't',   direct: 1.95, indirect: 0.20, note: 'CN 72/73 — crude-steel route, blast-furnace default.' },
+    aluminium:   { label: 'Aluminium',                 unit: 't',   direct: 1.60, indirect: 6.80, note: 'CN 76 — electrolysis makes indirect (power) dominant.' },
+    fertilisers: { label: 'Fertilisers (nitrogen)',    unit: 't',   direct: 2.40, indirect: 0.30, note: 'CN 31 — ammonia / nitric-acid feedstock.' },
+    hydrogen:    { label: 'Hydrogen',                  unit: 't',   direct: 9.00, indirect: 1.00, note: 'CN 2804 — grey H₂ from steam methane reforming.' },
+    electricity: { label: 'Electricity',               unit: 'MWh', direct: 0.55, indirect: 0.00, note: 'CN 2716 — default based on origin grid intensity.' },
+  };
+
+  // CBAM phase-in: share of embedded emissions requiring certificates as ETS free allocation phases out.
+  const PHASE_IN = {
+    2026: 0.025, 2027: 0.05, 2028: 0.10, 2029: 0.225, 2030: 0.485,
+    2031: 0.61, 2032: 0.735, 2033: 0.86, 2034: 1.00,
+  };
+
+  // Climate disclosure & compliance suite (12 live calculators).
+  const SPOKES = {
+    hubEU: [
+      ['CBAM Quarterly Reporting', 'cbam-quarterly-reporting-calculator'],
+      ['EU ETS Allowance', 'eu-ets-allowance-calculator'],
+      ['CSRD · ESRS E1 Disclosure', 'csrd-esrs-e1-disclosure-calculator'],
+    ],
+    hubGlobal: [
+      ['IFRS S2 Climate Disclosure', 'ifrs-s2-climate-disclosure-calculator'],
+      ['TCFD Scenario Analysis', 'tcfd-scenario-analysis-calculator'],
+      ['CDP Climate Questionnaire', 'cdp-climate-questionnaire-calculator'],
+    ],
+    hubNational: [
+      ['UK SECR', 'uk-secr-calculator'],
+      ['US SEC Climate Disclosure', 'sec-climate-disclosure-calculator'],
+      ['California SB-253', 'ca-sb-253-disclosure-calculator'],
+      ['California SB-261', 'ca-sb-261-climate-risk-calculator'],
+      ['Australia AASB S2', 'australia-aasb-s2-calculator'],
+      ['Singapore Climate Disclosure', 'singapore-climate-disclosure-calculator'],
+    ],
+  };
+
+  let period = 'transitional';
+  let useActual = false;
+
+  // --- Init dropdowns + hub ---
+  (function init() {
+    const good = document.getElementById('good');
+    for (const k in GOODS) {
+      const o = document.createElement('option');
+      o.value = k; o.textContent = GOODS[k].label;
+      good.appendChild(o);
+    }
+    const year = document.getElementById('year');
+    for (const y in PHASE_IN) {
+      const o = document.createElement('option');
+      o.value = y; o.textContent = y + ' — ' + (PHASE_IN[y] * 100).toLocaleString() + '% phase-in';
+      year.appendChild(o);
+    }
+    for (const groupId in SPOKES) {
+      const grid = document.getElementById(groupId);
+      SPOKES[groupId].forEach(([label, slug]) => {
+        const a = document.createElement('a');
+        a.className = 'gc-spoke';
+        a.href = LIVE_BASE + slug + '/';
+        a.innerHTML = '<span>' + label + '</span><span class="arr">↗</span>';
+        grid.appendChild(a);
+      });
+    }
+    // Period toggle
+    document.querySelectorAll('#period button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#period button').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        period = btn.dataset.period;
+        const isDef = period === 'definitive';
+        document.getElementById('yearWrap').style.display = isDef ? 'block' : 'none';
+        document.getElementById('periodNote').textContent = isDef
+          ? 'Definitive regime — surrender CBAM certificates against the EU ETS price.'
+          : 'Quarterly reports — embedded emissions only, no payment until 2026.';
+        onYearChange();
+      });
+    });
+    // Basis toggle
+    document.querySelectorAll('#basis button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#basis button').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        useActual = btn.dataset.actual === 'true';
+        document.getElementById('actualWrap').style.display = useActual ? 'grid' : 'none';
+        document.getElementById('basisNote').textContent = useActual
+          ? 'Verified installation-specific emissions from the operator.'
+          : 'Commission default values until verified installation data is available.';
+        if (useActual) prefillActual();
+      });
+    });
+    document.getElementById('year').addEventListener('change', onYearChange);
+    onGoodChange();
+  })();
+
+  function onGoodChange() {
+    const g = GOODS[document.getElementById('good').value];
+    document.getElementById('goodNote').textContent = g.note;
+    document.getElementById('unitQty').textContent = g.unit === 'MWh' ? 'megawatt-hours (MWh)' : 'tonnes';
+    document.getElementById('lblDirect').textContent = 'Direct intensity';
+    document.getElementById('lblIndirect').textContent = 'Indirect intensity';
+    if (useActual) prefillActual();
+  }
+
+  function prefillActual() {
+    const g = GOODS[document.getElementById('good').value];
+    if (!document.getElementById('direct').value) document.getElementById('direct').value = g.direct;
+    if (!document.getElementById('indirect').value) document.getElementById('indirect').value = g.indirect;
+  }
+
+  function onYearChange() {
+    const wrap = document.getElementById('yearNote');
+    if (period !== 'definitive') { wrap.textContent = ''; return; }
+    const y = document.getElementById('year').value;
+    wrap.textContent = (PHASE_IN[y] * 100).toLocaleString() + '% of embedded emissions need certificates in ' + y + '.';
+  }
+
+  const fmt = (n, d) => n.toLocaleString(undefined, { maximumFractionDigits: d });
+  const fmtT = (n) => Math.abs(n) >= 1 ? fmt(n, 2) : fmt(n, 4);
+
+  function calculate() {
+    const g = GOODS[document.getElementById('good').value];
+    const qty = parseFloat(document.getElementById('qty').value) || 0;
+    const origin = parseFloat(document.getElementById('origin').value) || 0;
+    const ets = parseFloat(document.getElementById('ets').value) || 0;
+
+    let di = g.direct, ii = g.indirect;
+    if (useActual) {
+      di = parseFloat(document.getElementById('direct').value) || 0;
+      ii = parseFloat(document.getElementById('indirect').value) || 0;
+    }
+
+    if (qty <= 0) {
+      document.getElementById('rv').innerHTML = '<span class="gc-empty">Enter a quantity</span>';
+      document.getElementById('ru').textContent = '';
+      ['liabBox','breakdown'].forEach(id => document.getElementById(id).style.display = 'none');
+      document.getElementById('liveLink').style.display = 'none';
+      return;
+    }
+
+    const directE = qty * di;
+    const indirectE = qty * ii;
+    const total = directE + indirectE;
+
+    // --- Hero: embedded emissions (always shown) ---
+    document.getElementById('rv').textContent = fmtT(total);
+    document.getElementById('ru').textContent = 'tCO₂e embedded';
+
+    // --- Certificate liability ---
+    const liabBox = document.getElementById('liabBox');
+    const liabValue = document.getElementById('liabValue');
+    const liabSub = document.getElementById('liabSub');
+    let phaseFactor = 0, rebateFactor = 0, certs = 0, cost = 0, phaseLabel = '—', yearLabel = '';
+
+    if (period === 'definitive') {
+      const y = document.getElementById('year').value;
+      phaseFactor = PHASE_IN[y];
+      yearLabel = y;
+      phaseLabel = (phaseFactor * 100).toLocaleString() + '% (' + y + ')';
+      rebateFactor = ets > 0 ? Math.min(1, origin / ets) : 0;   // carbon already priced at origin
+      certs = total * phaseFactor * (1 - rebateFactor);
+      cost = certs * ets;
+
+      liabBox.classList.remove('is-report');
+      liabValue.textContent = '€ ' + fmt(cost, 0);
+      liabSub.textContent = fmtT(certs) + ' certificates · ' + yearLabel;
+      document.getElementById('liabLabel').childNodes[0].nodeValue = 'CBAM liability ';
+    } else {
+      liabBox.classList.add('is-report');
+      liabValue.textContent = 'Report only';
+      liabSub.textContent = 'no certificates due before 2026';
+      document.getElementById('liabLabel').childNodes[0].nodeValue = 'Transitional period ';
+    }
+    liabBox.style.display = 'flex';
+
+    // --- Breakdown ---
+    document.getElementById('bd-good').textContent = g.label;
+    document.getElementById('bd-direct').textContent = fmtT(directE) + ' tCO₂e';
+    document.getElementById('bd-indirect').textContent = fmtT(indirectE) + ' tCO₂e';
+    document.getElementById('bd-total').textContent = fmtT(total) + ' tCO₂e';
+    document.getElementById('bd-phase').textContent = period === 'definitive' ? phaseLabel : 'n/a (transitional)';
+    document.getElementById('bd-rebate').textContent = period === 'definitive'
+      ? (rebateFactor > 0 ? '−' + fmt(rebateFactor * 100, 1) + '% (€' + fmt(origin, 0) + '/t paid)' : 'none')
+      : 'n/a';
+    document.getElementById('bd-certs').textContent = period === 'definitive' ? fmtT(certs) : '0';
+    document.getElementById('bd-cost').textContent = period === 'definitive' ? '€ ' + fmt(cost, 0) : '€ 0';
+    document.getElementById('breakdown').style.display = 'block';
+
+    document.getElementById('liveLink').style.display = 'block';
+  }
+</script>
+</body>
+</html>

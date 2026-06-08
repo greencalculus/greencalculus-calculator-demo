@@ -34,8 +34,9 @@ GHG Protocol and IPCC AR6. Open the demo, or jump straight to the full live calc
 | 🎯 **[SBTi Near-Term Target](./sbti-near-term-target.html)** | Science-based target via Absolute Contraction | [Open live ↗](https://greencalculus.com/calculators/sbti-near-term-target-calculator/) |
 | 🌿 **[FLAG Emissions](./flag-emissions.html)** | Forest, Land & Agriculture — LUC + LM + Removals | [Open live ↗](https://greencalculus.com/calculators/flag-emissions-calculator/) |
 | 💰 **[PCAF Financed Emissions](./pcaf-financed-emissions.html)** | All 7 PCAF Part A asset classes + DQ score; hub to the 10-calc suite | [Open live ↗](https://greencalculus.com/calculators/pcaf-listed-equity-corporate-bonds/) |
+| 🛂 **[CBAM Quarterly Reporting](./cbam-quarterly-reporting.html)** | Embedded emissions + certificate liability across the 6 CBAM goods; hub to the 12-calc disclosure suite | [Open live ↗](https://greencalculus.com/calculators/cbam-quarterly-reporting-calculator/) |
 
-The landing page ([`index.html`](./index.html)) is a gallery linking all four.
+The landing page ([`index.html`](./index.html)) is a gallery linking all five.
 
 ---
 
@@ -85,6 +86,22 @@ and the cross-asset data-quality tool).
 - **Standard:** PCAF Global GHG Accounting & Reporting Standard (Financed Emissions)
 - **Method:** attribution-factor accounting · auto-derived data-quality score
 
+### 🛂 CBAM Quarterly Reporting
+
+Estimates the **embedded emissions** of EU imports across the six CBAM goods (cement, iron
+& steel, aluminium, fertilisers, hydrogen, electricity) — `embedded = quantity × (direct +
+indirect intensity)` — then layers on the certificate liability: the **2026–2034 phase-in**
+(2.5% rising to 100% as EU ETS free allocation is withdrawn) and a **rebate** for any carbon
+price already paid in the country of origin. A *transitional* toggle reflects the report-only
+period through 2025. Doubles as a hub linking the full **12-calculator climate disclosure &
+compliance suite** (EU ETS, CSRD E1, IFRS S2, TCFD, CDP, SECR, SEC, CA SB-253/261, AASB S2,
+Singapore).
+
+- **Regulation:** (EU) 2023/956 — Carbon Border Adjustment Mechanism
+- **Method:** embedded-emissions accounting · phase-in factor · origin carbon-price rebate
+- **Note:** intensity defaults are illustrative; the live tool uses the Commission's
+  published default-value tables per good and country of origin
+
 ---
 
 ## Technical spec
@@ -112,7 +129,7 @@ All emission factors and GWP values are documented in:
 
 ## Full platform
 
-A demo of four calculators from [GreenCalculus.com](https://greencalculus.com) — the
+A demo of five calculators from [GreenCalculus.com](https://greencalculus.com) — the
 traceable reference layer for corporate carbon accounting, built for sustainability
 officers, engineers, and CSRD compliance teams.
 
