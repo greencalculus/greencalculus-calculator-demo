@@ -163,6 +163,13 @@
   }
   .gc-footer a { color: var(--c-action); text-decoration: none; }
   .gc-footer a:hover { text-decoration: underline; }
+
+  /* Related references */
+  .gc-refs { margin-block-start: 2.5rem; }
+  .gc-refs h2 { font-size: 0.9rem; font-weight: 600; margin-block-end: 0.4rem; }
+  .gc-refs > p { font-size: 0.85rem; color: var(--c-muted); margin-block-end: 1.25rem; line-height: 1.6; }
+  .gc-refs-group { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-action); margin: 1.25rem 0 0.6rem; }
+  .gc-refs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.6rem; }
 </style>
 </head>
 <body>
@@ -302,6 +309,38 @@
     PCAF's evidence hierarchy: reported &amp; verified (1) down to a sector-revenue proxy (5). Lower is better,
     and it's reported alongside every tonne so users know how solid the number is.
   </div>
+
+  <!-- RELATED LIVE PAGES -->
+  <section class="gc-refs">
+    <h2>Related on GreenCalculus.com</h2>
+    <p>The methodology, standards, definitions and related tools behind this calculator — all live on the platform.</p>
+
+    <div class="gc-refs-group">Methodology</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/methodology/pcaf-listed-equity-corporate-bonds-methodology/"><span>PCAF Listed Equity & Bonds</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/methodology/pcaf-data-quality-score-methodology/"><span>PCAF Data-Quality Score</span><span class="arr">↗</span></a>
+    </div>
+
+    <div class="gc-refs-group">Standards</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/standards/pcaf-financed-emissions-standard/"><span>PCAF Financed Emissions Standard</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/standards/pcaf-facilitated-emissions-standard/"><span>PCAF Facilitated Emissions</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/standards/pcaf-insurance-associated-emissions-standard/"><span>PCAF Insurance-Associated</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/standards/sbti-financial-institutions-net-zero-standard/"><span>SBTi Financial Institutions</span><span class="arr">↗</span></a>
+    </div>
+
+    <div class="gc-refs-group">Glossary</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/financed-emissions/"><span>Financed emissions</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/attribution-factor/"><span>Attribution factor</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/evic/"><span>EVIC</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/pcaf-data-quality-score/"><span>PCAF data-quality score</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/facilitated-emissions/"><span>Facilitated emissions</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/insurance-associated-emissions/"><span>Insurance-associated emissions</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/waci/"><span>WACI</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/scope-3-cat-15/"><span>Scope 3 Cat 15 (Investments)</span><span class="arr">↗</span></a>
+    </div>
+  </section>
 
   <footer class="gc-footer">
     <span>Live suite: <a href="https://greencalculus.com/calculators/pcaf-listed-equity-corporate-bonds/">PCAF calculators on GreenCalculus.com ↗</a></span>

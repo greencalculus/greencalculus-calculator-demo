@@ -146,6 +146,13 @@
   }
   .gc-footer a { color: var(--c-action); text-decoration: none; }
   .gc-footer a:hover { text-decoration: underline; }
+
+  /* Related references */
+  .gc-refs { margin-block-start: 2.5rem; }
+  .gc-refs h2 { font-size: 0.9rem; font-weight: 600; margin-block-end: 0.4rem; }
+  .gc-refs > p { font-size: 0.85rem; color: var(--c-muted); margin-block-end: 1.25rem; line-height: 1.6; }
+  .gc-refs-group { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-action); margin: 1.25rem 0 0.6rem; }
+  .gc-refs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.6rem; }
 </style>
 </head>
 <body>
@@ -256,6 +263,35 @@
     illustrative DESNZ 2024 averages; the live tools use distance bands (domestic / short-haul / long-haul),
     cabin class, and vehicle-specific factors.
   </div>
+
+  <!-- RELATED LIVE PAGES -->
+  <section class="gc-refs">
+    <h2>Related on GreenCalculus.com</h2>
+    <p>The methodology, standards, definitions and related tools behind this calculator — all live on the platform.</p>
+
+    <div class="gc-refs-group">Methodology</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/methodology/business-travel-air-emissions/"><span>Business Travel — Air</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/methodology/business-travel-car-methodology/"><span>Business Travel — Car</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/methodology/hotel-stay-hcmi-methodology/"><span>Hotel Stay (HCMI)</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/methodology/employee-commuting-wfh-methodology/"><span>Commuting & WFH</span><span class="arr">↗</span></a>
+    </div>
+
+    <div class="gc-refs-group">Standards & data</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/standards/ghg-protocol-scope-3-standard/"><span>GHG Protocol Scope 3 Standard</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/standards/iata-rp-1726/"><span>IATA RP 1726</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/standards/cornell-hcmi-hotel-carbon-measurement/"><span>Cornell HCMI</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/standards/uk-defra-emission-factors/"><span>UK DEFRA Emission Factors</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/data/business-travel-freight-logistics-emission-factors/"><span>Travel & Freight Factors</span><span class="arr">↗</span></a>
+    </div>
+
+    <div class="gc-refs-group">Glossary</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/scope-3-emissions/"><span>Scope 3 emissions</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/co2e-carbon-dioxide-equivalent/"><span>CO₂e</span><span class="arr">↗</span></a>
+    </div>
+  </section>
 
   <footer class="gc-footer">
     <span>Live tool: <a href="https://greencalculus.com/calculators/business-travel-air-calculator/">Business-travel calculator on GreenCalculus.com ↗</a></span>
