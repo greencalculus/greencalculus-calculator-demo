@@ -6,11 +6,15 @@
 
 ### Open-source, zero-dependency demos of production carbon calculators.
 
+Eight self-contained demos spanning the full corporate inventory — **Scope 1, 2 and 3**, plus
+target-setting, financed emissions and climate disclosure.
+
 [**Live demos**](https://greencalculus.github.io/greencalculus-calculator-demo/) · [greencalculus.com](https://greencalculus.com) · [Methodology](https://github.com/greencalculus/greencalculus-methodology) · [Standards](https://github.com/greencalculus/greencalculus-standards)
 
 ![Vanilla JS](https://img.shields.io/badge/Vanilla_JS-Zero_dependencies-04BF62?style=flat-square)
-![GHG Protocol](https://img.shields.io/badge/GHG_Protocol-Corporate-04BF62?style=flat-square)
+![Scope 1·2·3](https://img.shields.io/badge/GHG_Protocol-Scope_1·2·3-04BF62?style=flat-square)
 ![IPCC AR6](https://img.shields.io/badge/IPCC_AR6-GWP--100-04BF62?style=flat-square)
+![SBTi · PCAF · CBAM](https://img.shields.io/badge/SBTi_·_PCAF_·_CBAM-aligned-04BF62?style=flat-square)
 ![License: MIT](https://img.shields.io/badge/License-MIT-04BF62?style=flat-square)
 
 </div>
@@ -19,7 +23,11 @@
 
 Self-contained demos of production calculators from
 [GreenCalculus.com](https://greencalculus.com) — built for sustainability officers,
-engineers, and CSRD compliance teams.
+engineers, and CSRD compliance teams. The gallery walks the whole corporate inventory:
+roll everything up in the **GHG Inventory Aggregator**, then drill into **Scope 1**
+(combustion), **Scope 2** (electricity, dual reporting) and **Scope 3** (business travel
++ the value-chain suite) — alongside SBTi targets, FLAG land emissions, PCAF financed
+emissions and EU CBAM border carbon.
 
 Each demo is a **single HTML file**: vanilla JavaScript, zero dependencies, built to
 GHG Protocol and IPCC AR6. Open the demo, or jump straight to the full live calculator.
