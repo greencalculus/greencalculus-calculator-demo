@@ -31,12 +31,14 @@ GHG Protocol and IPCC AR6. Open the demo, or jump straight to the full live calc
 | Demo | Scope | Live calculator |
 |---|---|---|
 | 🔥 **[Scope 1 Stationary Combustion](./stationary-combustion.html)** | Direct fuel combustion → tCO₂e, 10 fuel types | [Open live ↗](https://greencalculus.com/calculators/scope-1-combustion-calculator/) |
+| ⚡ **[Scope 2 Electricity](./scope-2-electricity.html)** | Purchased electricity → tCO₂e with dual location-based + market-based reporting (EAC/PPA/residual mix) | [Open live ↗](https://greencalculus.com/calculators/scope-2-electricity-calculator/) |
+| ✈️ **[Scope 3 Business Travel](./scope-3-business-travel.html)** | Category 6 air/rail/road/hotel + radiative-forcing uplift; hub to the full Scope 3 value-chain suite | [Open live ↗](https://greencalculus.com/calculators/business-travel-air-calculator/) |
 | 🎯 **[SBTi Near-Term Target](./sbti-near-term-target.html)** | Science-based target via Absolute Contraction | [Open live ↗](https://greencalculus.com/calculators/sbti-near-term-target-calculator/) |
 | 🌿 **[FLAG Emissions](./flag-emissions.html)** | Forest, Land & Agriculture — LUC + LM + Removals | [Open live ↗](https://greencalculus.com/calculators/flag-emissions-calculator/) |
 | 💰 **[PCAF Financed Emissions](./pcaf-financed-emissions.html)** | All 7 PCAF Part A asset classes + DQ score; hub to the 10-calc suite | [Open live ↗](https://greencalculus.com/calculators/pcaf-listed-equity-corporate-bonds/) |
 | 🛂 **[CBAM Quarterly Reporting](./cbam-quarterly-reporting.html)** | Embedded emissions + certificate liability across the 6 CBAM goods; hub to the 12-calc disclosure suite | [Open live ↗](https://greencalculus.com/calculators/cbam-quarterly-reporting-calculator/) |
 
-The landing page ([`index.html`](./index.html)) is a gallery linking all five.
+The landing page ([`index.html`](./index.html)) is a gallery linking all seven.
 
 ---
 
@@ -49,6 +51,31 @@ GWP basis, raw kg result, and annualised figure.
 
 - **Standard:** GHG Protocol Corporate Standard — Scope 1
 - **Factors:** UK DESNZ 2024 · **GWP:** IPCC AR6 GWP-100
+
+### ⚡ Scope 2 Electricity
+
+Reports purchased electricity **two ways at once**, as the GHG Protocol Scope 2 Guidance requires in
+markets with energy attribute certificates. The **location-based** method applies the average grid factor
+for where power is consumed; the **market-based** method reflects contractual instruments —
+`market = covered share × 0 + uncovered share × residual mix`. Pick a grid, choose an instrument (residual
+mix, EACs — RECs/GOs/REGOs/I-RECs, a PPA, or a supplier-specific factor), set the renewable coverage, and
+watch certificates drive the *market-based* number toward zero while the *location-based* number holds.
+
+- **Standard:** GHG Protocol Scope 2 Guidance — dual reporting
+- **Factors:** IEA / Ember location factors · AIB & EPA eGRID residual mix · **GWP:** IPCC AR6 GWP-100
+
+### ✈️ Scope 3 Business Travel
+
+Calculates **GHG Protocol Scope 3, Category 6** travel with the activity method —
+`emissions = activity × factor` — across air (domestic, short-haul, long-haul economy & business), rail,
+car/taxi, and hotel stays, with the optional **radiative-forcing uplift (×1.9)** for the non-CO₂
+high-altitude effects of flying. Doubles as a hub linking the full **Scope 3 value-chain suite** (23 live
+calculators across Categories 1–14): spend-based purchased goods, well-to-tank, T&D losses, freight by six
+modes, waste, commuting & WFH, leased assets, use of sold products, end-of-life, franchises, and more — all
+rolled up by the GHG Inventory Aggregator.
+
+- **Standard:** GHG Protocol Corporate Value Chain (Scope 3) — Category 6
+- **Factors:** UK DESNZ 2024 (pax-km / room-night) · **GWP:** IPCC AR6 GWP-100
 
 ### 🎯 SBTi Near-Term Target
 
@@ -129,7 +156,7 @@ All emission factors and GWP values are documented in:
 
 ## Full platform
 
-A demo of five calculators from [GreenCalculus.com](https://greencalculus.com) — the
+A demo of seven calculators from [GreenCalculus.com](https://greencalculus.com) — the
 traceable reference layer for corporate carbon accounting, built for sustainability
 officers, engineers, and CSRD compliance teams.
 
