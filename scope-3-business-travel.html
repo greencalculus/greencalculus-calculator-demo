@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scope 3 Business Travel Calculator — GreenCalculus</title>
+<meta name="description" content="Calculate Scope 3 Category 6 business-travel emissions across air, rail, road and hotel stays in tCO2e, with the radiative-forcing uplift for flights. GHG Protocol Scope 3 aligned. A hub to the full Scope 3 value-chain suite. Free demo by GreenCalculus.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --c-trust: #1D3215;
+    --c-action: #04BF62;
+    --c-action-dark: #03a554;
+    --c-bg: #0f1a0d;
+    --c-surface: #1a2e17;
+    --c-surface-2: #213820;
+    --c-border: rgba(4,191,98,0.15);
+    --c-text: #e8f5e2;
+    --c-muted: #7a9b72;
+    --c-mono: #a8d4a0;
+    --radius: 10px;
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans); background: var(--c-bg); color: var(--c-text);
+    min-height: 100vh; padding: clamp(1rem, 4vw, 2rem);
+  }
+  .gc-wrap { max-width: 960px; margin-inline: auto; }
+
+  .gc-nav {
+    display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem;
+    font-family: var(--font-mono); color: var(--c-muted); margin-block-end: 1.5rem;
+  }
+  .gc-nav a { color: var(--c-action); text-decoration: none; }
+  .gc-nav a:hover { text-decoration: underline; }
+  .gc-nav span { color: var(--c-muted); }
+
+  .gc-header { margin-block-end: 2rem; padding-block-end: 1.5rem; border-bottom: 1px solid var(--c-border); }
+  .gc-wordmark {
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--c-action); margin-block-end: 0.5rem;
+  }
+  .gc-wordmark a { color: inherit; text-decoration: none; }
+  .gc-header h1 { font-size: clamp(1.25rem, 3vw, 1.75rem); font-weight: 600; line-height: 1.2; margin-block-end: 0.5rem; }
+  .gc-header p { font-size: 0.9rem; color: var(--c-muted); line-height: 1.6; }
+  .gc-header code { font-family: var(--font-mono); color: var(--c-mono); font-size: 0.85em; }
+  .gc-badges { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-start: 0.75rem; }
+  .gc-badge {
+    font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px;
+    background: var(--c-surface-2); border: 1px solid var(--c-border); color: var(--c-mono);
+  }
+
+  .gc-calc { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+  @media (max-width: 640px) { .gc-calc { grid-template-columns: 1fr; } }
+
+  .gc-panel { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius); padding: 1.5rem; }
+  .gc-panel > h2 {
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--c-muted); margin-block-end: 1.25rem;
+  }
+
+  .gc-field { margin-block-end: 1.1rem; }
+  .gc-field label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--c-muted); margin-block-end: 0.4rem; }
+  .gc-field select, .gc-field input {
+    width: 100%; padding: 0.6rem 0.85rem; background: var(--c-surface-2);
+    border: 1px solid var(--c-border); border-radius: 6px; color: var(--c-text);
+    font-family: var(--font-mono); font-size: 0.9rem; appearance: none; transition: border-color 0.15s;
+  }
+  .gc-field select:focus, .gc-field input:focus { outline: none; border-color: var(--c-action); }
+  .gc-field .gc-unit { font-size: 0.73rem; color: var(--c-muted); margin-block-start: 0.3rem; font-family: var(--font-mono); }
+  .gc-two { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+
+  .gc-check { display: flex; align-items: flex-start; gap: 0.55rem; margin-block-end: 1.1rem; }
+  .gc-check input { width: auto; margin-block-start: 0.15rem; accent-color: var(--c-action); }
+  .gc-check label { font-size: 0.8rem; color: var(--c-muted); margin: 0; line-height: 1.45; }
+
+  .gc-btn {
+    width: 100%; padding: 0.8rem; background: var(--c-action); color: #0f1a0d; border: none;
+    border-radius: 6px; font-family: var(--font-sans); font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; transition: background 0.15s; margin-block-start: 0.5rem;
+  }
+  .gc-btn:hover { background: var(--c-action-dark); }
+
+  .gc-result-primary {
+    text-align: center; padding: 1.5rem 1rem; background: var(--c-surface-2); border-radius: var(--radius);
+    margin-block-end: 1.1rem; border: 1px solid var(--c-border);
+  }
+  .gc-result-label { font-size: 0.72rem; color: var(--c-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-block-end: 0.5rem; }
+  .gc-result-value {
+    font-family: var(--font-mono); font-size: clamp(1.9rem, 5vw, 2.5rem); font-weight: 500;
+    color: var(--c-action); font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .gc-result-unit { font-family: var(--font-mono); font-size: 0.82rem; color: var(--c-muted); margin-block-start: 0.4rem; }
+
+  .gc-breakdown { border-top: 1px solid var(--c-border); padding-block-start: 1rem; }
+  .gc-breakdown h3 { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-muted); margin-block-end: 0.75rem; }
+  .gc-breakdown-row {
+    display: flex; justify-content: space-between; align-items: center; padding-block: 0.35rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem; gap: 1rem;
+  }
+  .gc-breakdown-row:last-child { border-bottom: none; }
+  .gc-breakdown-key { color: var(--c-muted); }
+  .gc-breakdown-val { font-family: var(--font-mono); font-size: 0.82rem; font-variant-numeric: tabular-nums; color: var(--c-text); text-align: right; }
+  .gc-breakdown-val.pos { color: var(--c-action); }
+
+  .gc-empty { font-family: var(--font-mono); font-size: 1.1rem; color: var(--c-muted); text-align: center; padding: 2rem 0; }
+
+  .gc-livelink {
+    display: block; margin-block-start: 1.1rem; padding: 0.7rem 1rem; text-align: center;
+    border: 1px dashed var(--c-border); border-radius: 6px; font-size: 0.82rem;
+    color: var(--c-action); text-decoration: none; transition: 0.15s;
+  }
+  .gc-livelink:hover { border-color: var(--c-action); background: rgba(4,191,98,0.06); }
+
+  /* Hub directory */
+  .gc-hub { margin-block-start: 2.5rem; }
+  .gc-hub h2 { font-size: 0.9rem; font-weight: 600; margin-block-end: 0.4rem; }
+  .gc-hub > p { font-size: 0.85rem; color: var(--c-muted); margin-block-end: 1.25rem; line-height: 1.6; }
+  .gc-hub-group { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-action); margin: 1.25rem 0 0.6rem; }
+  .gc-hub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.6rem; }
+  .gc-spoke {
+    display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;
+    padding: 0.7rem 0.9rem; background: var(--c-surface); border: 1px solid var(--c-border);
+    border-radius: 8px; text-decoration: none; color: var(--c-text); font-size: 0.83rem; transition: 0.15s;
+  }
+  .gc-spoke:hover { border-color: rgba(4,191,98,0.4); transform: translateY(-1px); }
+  .gc-spoke .arr { color: var(--c-action); font-family: var(--font-mono); }
+
+  .gc-insight {
+    margin-block-start: 2.5rem; padding: 1rem 1.25rem; background: var(--c-surface);
+    border-left: 3px solid var(--c-action); border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 0.85rem; color: var(--c-muted); line-height: 1.6;
+  }
+  .gc-insight strong { color: var(--c-text); }
+  .gc-insight code { font-family: var(--font-mono); color: var(--c-mono); font-size: 0.85em; }
+
+  .gc-footer {
+    margin-block-start: 2.5rem; padding-block-start: 1.5rem; border-top: 1px solid var(--c-border);
+    font-size: 0.78rem; color: var(--c-muted); display: flex; flex-wrap: wrap;
+    gap: 0.5rem 1.5rem; align-items: center; line-height: 1.7;
+  }
+  .gc-footer a { color: var(--c-action); text-decoration: none; }
+  .gc-footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="gc-wrap">
+
+  <nav class="gc-nav">
+    <a href="./index.html">← All calculators</a>
+    <span>/</span>
+    <span>Scope 3 Business Travel</span>
+  </nav>
+
+  <header class="gc-header">
+    <div class="gc-wordmark"><a href="https://greencalculus.com">GreenCalculus</a></div>
+    <h1>Scope 3 Business Travel Calculator</h1>
+    <p>Business travel is <strong>GHG Protocol Scope 3, Category 6</strong> — emissions from employee
+       transport in vehicles not owned by the company. The activity method multiplies a travel amount by
+       a mode-specific factor — <code>emissions = activity × factor</code> — with a
+       <strong>radiative-forcing</strong> uplift for the non-CO₂ effects of flying at altitude. Pick a mode,
+       enter the trip, and roll it up across the whole value chain below.</p>
+    <div class="gc-badges">
+      <span class="gc-badge">GHG Protocol Scope 3</span>
+      <span class="gc-badge">Category 6</span>
+      <span class="gc-badge">Radiative forcing</span>
+      <span class="gc-badge">Vanilla JS</span>
+    </div>
+  </header>
+
+  <div class="gc-calc">
+
+    <!-- INPUTS -->
+    <div class="gc-panel">
+      <h2>Inputs</h2>
+
+      <div class="gc-field">
+        <label for="mode">Travel mode</label>
+        <select id="mode" onchange="onModeChange()"></select>
+        <div class="gc-unit" id="modeNote"></div>
+      </div>
+
+      <div class="gc-field">
+        <label id="lblQty" for="qty">Distance travelled</label>
+        <div class="gc-two">
+          <input type="number" id="qty" min="0" step="any" placeholder="0">
+          <input type="number" id="pax" min="1" step="1" value="1" title="Travellers">
+        </div>
+        <div class="gc-unit"><span id="unitQty">km</span> · <span id="paxLabel">travellers</span></div>
+      </div>
+
+      <div class="gc-check" id="rfWrap">
+        <input type="checkbox" id="rf" checked>
+        <label for="rf">Apply radiative-forcing uplift (×1.9) — recommended for flights to reflect
+          non-CO₂ high-altitude effects (DESNZ / DEFRA guidance).</label>
+      </div>
+
+      <button class="gc-btn" onclick="calculate()">Calculate Emissions</button>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="gc-panel">
+      <h2>Results</h2>
+
+      <div class="gc-result-primary">
+        <div class="gc-result-label">Travel emissions</div>
+        <div class="gc-result-value" id="rv"><span class="gc-empty">—</span></div>
+        <div class="gc-result-unit" id="ru"></div>
+      </div>
+
+      <div class="gc-breakdown" id="breakdown" style="display:none;">
+        <h3>Calculation breakdown</h3>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Mode</span><span class="gc-breakdown-val" id="bd-mode">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Activity</span><span class="gc-breakdown-val" id="bd-act">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Emission factor</span><span class="gc-breakdown-val" id="bd-factor">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Radiative forcing</span><span class="gc-breakdown-val" id="bd-rf">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Raw result (kg CO₂e)</span><span class="gc-breakdown-val" id="bd-kg">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Total (tCO₂e)</span><span class="gc-breakdown-val pos" id="bd-t">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">GWP basis</span><span class="gc-breakdown-val">IPCC AR6 GWP-100</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Source</span><span class="gc-breakdown-val">DESNZ 2024</span></div>
+      </div>
+
+      <a class="gc-livelink" id="liveLink" href="https://greencalculus.com/calculators/business-travel-air-calculator/" style="display:none;">Open the full business-travel tool on GreenCalculus.com ↗</a>
+    </div>
+  </div>
+
+  <!-- HUB DIRECTORY -->
+  <section class="gc-hub">
+    <h2>The Scope 3 value-chain suite</h2>
+    <p>Category 6 is one of the fifteen Scope 3 categories. Each calculator below runs the full activity- or
+       spend-based methodology on GreenCalculus.com — with live emission factors, audit trails, and
+       schema-aligned exports. The <a href="https://greencalculus.com/calculators/ghg-inventory-aggregator-scope123-calculator/">GHG Inventory Aggregator</a>
+       rolls Scope 1, 2 and all of these into one auditable total.</p>
+
+    <div class="gc-hub-group">Upstream · Categories 1–5</div>
+    <div class="gc-hub-grid" id="hubUpstream"></div>
+
+    <div class="gc-hub-group">Travel &amp; workforce · Categories 6–8</div>
+    <div class="gc-hub-grid" id="hubTravel"></div>
+
+    <div class="gc-hub-group">Downstream · Categories 9–14</div>
+    <div class="gc-hub-grid" id="hubDownstream"></div>
+  </section>
+
+  <div class="gc-insight">
+    <strong>Why the radiative-forcing toggle matters:</strong>
+    Aircraft emit CO₂, but also water vapour, NOₓ and contrails at altitude that add to warming. DESNZ/DEFRA
+    guidance applies a <code>×1.9</code> multiplier to convert the CO₂e of a flight into a fuller climate
+    impact. It is optional under the GHG Protocol, so most companies report both with and without it — which
+    is why this demo lets you switch it on and off. Rail and road have no such uplift. Factors here are
+    illustrative DESNZ 2024 averages; the live tools use distance bands (domestic / short-haul / long-haul),
+    cabin class, and vehicle-specific factors.
+  </div>
+
+  <footer class="gc-footer">
+    <span>Live tool: <a href="https://greencalculus.com/calculators/business-travel-air-calculator/">Business-travel calculator on GreenCalculus.com ↗</a></span>
+    <span>Methodology: <a href="https://github.com/greencalculus/greencalculus-methodology">greencalculus-methodology</a></span>
+    <span>Standard: GHG Protocol Corporate Value Chain (Scope 3) — Category 6</span>
+  </footer>
+
+</div>
+
+<script>
+  const LIVE_BASE = 'https://greencalculus.com/calculators/';
+
+  // Illustrative DESNZ 2024 averages. Air/rail/road are per passenger-km; hotel is per room-night.
+  // `rf: true` modes are eligible for the radiative-forcing uplift. The live tools use distance bands,
+  // cabin class, and country-specific hotel factors.
+  const MODES = {
+    air_domestic:  { label: 'Air — domestic',            unit: 'pax-km',   factor: 0.24600, rf: true,  note: 'Short domestic sectors carry the highest per-km factor.' },
+    air_short:     { label: 'Air — short-haul (intl)',   unit: 'pax-km',   factor: 0.15100, rf: true,  note: 'Economy, average short-haul international.' },
+    air_long_eco:  { label: 'Air — long-haul economy',   unit: 'pax-km',   factor: 0.14800, rf: true,  note: 'Economy cabin, long-haul.' },
+    air_long_biz:  { label: 'Air — long-haul business',  unit: 'pax-km',   factor: 0.42900, rf: true,  note: 'Business cabin floor area ≈ 2.9× economy.' },
+    rail_national: { label: 'Rail — national',           unit: 'pax-km',   factor: 0.03550, rf: false, note: 'National rail average; electrified routes lower.' },
+    rail_intl:     { label: 'Rail — international (HSR)', unit: 'pax-km',   factor: 0.00500, rf: false, note: 'High-speed rail on low-carbon grids (e.g. Eurostar).' },
+    car_average:   { label: 'Car — average / hire',      unit: 'pax-km',   factor: 0.16700, rf: false, note: 'Average car, unknown fuel; per vehicle-km.' },
+    taxi:          { label: 'Taxi / private hire',       unit: 'pax-km',   factor: 0.14900, rf: false, note: 'Regular taxi, average.' },
+    hotel:         { label: 'Hotel stay',                unit: 'room-night', factor: 12.20000, rf: false, note: 'Per room-night, UK average; varies widely by country.' },
+  };
+
+  // Full Scope 3 value-chain suite (live calculators), grouped by GHG Protocol category.
+  const SPOKES = {
+    hubUpstream: [
+      ['Cat 1 · Purchased Goods (spend)', 'scope-3-category-1-spend-based-calculator'],
+      ['Cat 3 · Well-to-Tank (WTT)',      'scope-3-cat-3-well-to-tank-calculator'],
+      ['Cat 3 · T&D Losses',              'scope-3-cat-3-td-losses-calculator'],
+      ['Cat 4 · Road Freight',            'scope-3-cat-4-road-freight-calculator'],
+      ['Cat 4 · Rail Freight',            'scope-3-cat-4-rail-freight-calculator'],
+      ['Cat 4 · Sea Freight',             'scope-3-cat-4-sea-freight-calculator'],
+      ['Cat 4 · Air Freight',             'scope-3-cat-4-air-freight-calculator'],
+      ['Cat 4 · Cold-Chain Logistics',    'scope-3-cat-4-cold-chain-logistics-calculator'],
+      ['Cat 4 · Last-Mile Delivery',      'scope-3-cat-4-last-mile-delivery-calculator'],
+      ['Cat 5 · Waste by Stream',         'scope-3-cat-5-waste-streams-calculator'],
+      ['Cat 5 · Waste by Route',          'scope-3-cat-5-waste-by-route-calculator'],
+    ],
+    hubTravel: [
+      ['Cat 6 · Business Travel — Air',   'business-travel-air-calculator'],
+      ['Cat 6 · Business Travel — Rail',  'scope-3-cat-6-business-travel-rail-calculator'],
+      ['Cat 6 · Business Travel — Car',   'scope-3-cat-6-business-travel-phc-calculator'],
+      ['Cat 6 · Hotel Stay',              'scope-3-cat-6-hotel-stay-calculator'],
+      ['Cat 7 · Commuting & WFH',         'scope-3-cat-7-employee-commuting-wfh-calculator'],
+      ['Cat 8 · Upstream Leased Assets',  'scope-3-cat-8-upstream-leased-assets-calculator'],
+    ],
+    hubDownstream: [
+      ['Cat 9 · Downstream T&D',          'scope-3-cat-9-downstream-tnd-calculator'],
+      ['Cat 10 · Processing of Products', 'scope-3-cat-10-processing-sold-products-calculator'],
+      ['Cat 11 · Use of Sold Products',   'scope-3-cat-11-use-of-sold-products-calculator'],
+      ['Cat 12 · End-of-Life',            'scope-3-cat-12-end-of-life-calculator'],
+      ['Cat 13 · Downstream Leased',      'scope-3-cat-13-downstream-leased-assets-calculator'],
+      ['Cat 14 · Franchises',             'scope-3-cat-14-franchises-calculator'],
+    ],
+  };
+
+  // --- Init dropdowns + hub ---
+  (function init() {
+    const mode = document.getElementById('mode');
+    for (const k in MODES) {
+      const o = document.createElement('option');
+      o.value = k; o.textContent = MODES[k].label;
+      mode.appendChild(o);
+    }
+    for (const groupId in SPOKES) {
+      const grid = document.getElementById(groupId);
+      SPOKES[groupId].forEach(([label, slug]) => {
+        const a = document.createElement('a');
+        a.className = 'gc-spoke';
+        a.href = LIVE_BASE + slug + '/';
+        a.innerHTML = '<span>' + label + '</span><span class="arr">↗</span>';
+        grid.appendChild(a);
+      });
+    }
+    onModeChange();
+  })();
+
+  function onModeChange() {
+    const m = MODES[document.getElementById('mode').value];
+    document.getElementById('modeNote').textContent = m.note;
+    const isHotel = m.unit === 'room-night';
+    document.getElementById('lblQty').textContent = isHotel ? 'Room-nights' : 'Distance travelled';
+    document.getElementById('unitQty').textContent = m.unit;
+    document.getElementById('paxLabel').textContent = isHotel ? 'rooms' : 'travellers';
+    document.getElementById('rfWrap').style.display = m.rf ? 'flex' : 'none';
+  }
+
+  const fmt = (n, d) => n.toLocaleString(undefined, { maximumFractionDigits: d });
+  const fmtT = (n) => Math.abs(n) >= 1 ? fmt(n, 2) : fmt(n, 4);
+
+  function calculate() {
+    const m   = MODES[document.getElementById('mode').value];
+    const qty = parseFloat(document.getElementById('qty').value) || 0;
+    const pax = Math.max(1, parseInt(document.getElementById('pax').value) || 1);
+    const useRf = m.rf && document.getElementById('rf').checked;
+
+    if (qty <= 0) {
+      document.getElementById('rv').innerHTML = '<span class="gc-empty">Enter an amount</span>';
+      document.getElementById('ru').textContent = '';
+      document.getElementById('breakdown').style.display = 'none';
+      document.getElementById('liveLink').style.display = 'none';
+      return;
+    }
+
+    const rfMult = useRf ? 1.9 : 1.0;
+    const activity = qty * pax;                 // pax-km or room-nights
+    const kg = activity * m.factor * rfMult;
+    const t  = kg / 1000;
+
+    document.getElementById('rv').textContent = fmtT(t);
+    document.getElementById('ru').textContent = 'tCO₂e';
+
+    document.getElementById('bd-mode').textContent   = m.label;
+    document.getElementById('bd-act').textContent    = fmt(activity, 0) + ' ' + m.unit
+      + (m.unit !== 'room-night' && pax > 1 ? ' (' + fmt(qty, 0) + ' × ' + pax + ')' : '');
+    document.getElementById('bd-factor').textContent = m.factor.toFixed(5) + ' kg/' + m.unit;
+    document.getElementById('bd-rf').textContent     = m.rf ? (useRf ? '×1.9 applied' : 'not applied') : 'n/a';
+    document.getElementById('bd-kg').textContent     = fmt(kg, 2) + ' kg';
+    document.getElementById('bd-t').textContent      = fmtT(t) + ' tCO₂e';
+
+    document.getElementById('breakdown').style.display = 'block';
+    document.getElementById('liveLink').style.display  = 'block';
+  }
+
+  document.getElementById('qty').addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+</script>
+</body>
+</html>

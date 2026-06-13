@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scope 2 Electricity Calculator — GreenCalculus</title>
+<meta name="description" content="Calculate Scope 2 purchased-electricity emissions with mandatory dual reporting — location-based grid factors and market-based EAC/PPA instruments — in tCO2e. GHG Protocol Scope 2 Guidance. Free demo by GreenCalculus.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --c-trust: #1D3215;
+    --c-action: #04BF62;
+    --c-action-dark: #03a554;
+    --c-bg: #0f1a0d;
+    --c-surface: #1a2e17;
+    --c-surface-2: #213820;
+    --c-border: rgba(4,191,98,0.15);
+    --c-text: #e8f5e2;
+    --c-muted: #7a9b72;
+    --c-mono: #a8d4a0;
+    --c-alt: #5BA9D4;
+    --radius: 10px;
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans); background: var(--c-bg); color: var(--c-text);
+    min-height: 100vh; padding: clamp(1rem, 4vw, 2rem);
+  }
+  .gc-wrap { max-width: 900px; margin-inline: auto; }
+
+  .gc-nav {
+    display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem;
+    font-family: var(--font-mono); color: var(--c-muted); margin-block-end: 1.5rem;
+  }
+  .gc-nav a { color: var(--c-action); text-decoration: none; }
+  .gc-nav a:hover { text-decoration: underline; }
+  .gc-nav span { color: var(--c-muted); }
+
+  .gc-header { margin-block-end: 2rem; padding-block-end: 1.5rem; border-bottom: 1px solid var(--c-border); }
+  .gc-wordmark {
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--c-action); margin-block-end: 0.5rem;
+  }
+  .gc-wordmark a { color: inherit; text-decoration: none; }
+  .gc-header h1 { font-size: clamp(1.25rem, 3vw, 1.75rem); font-weight: 600; line-height: 1.2; margin-block-end: 0.5rem; }
+  .gc-header p { font-size: 0.9rem; color: var(--c-muted); line-height: 1.6; }
+  .gc-header code { font-family: var(--font-mono); color: var(--c-mono); font-size: 0.85em; }
+  .gc-badges { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-start: 0.75rem; }
+  .gc-badge {
+    font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px;
+    background: var(--c-surface-2); border: 1px solid var(--c-border); color: var(--c-mono);
+  }
+
+  .gc-calc { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+  @media (max-width: 640px) { .gc-calc { grid-template-columns: 1fr; } }
+
+  .gc-panel { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius); padding: 1.5rem; }
+  .gc-panel > h2 {
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--c-muted); margin-block-end: 1.25rem;
+  }
+
+  .gc-field { margin-block-end: 1.1rem; }
+  .gc-field label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--c-muted); margin-block-end: 0.4rem; }
+  .gc-field select, .gc-field input {
+    width: 100%; padding: 0.6rem 0.85rem; background: var(--c-surface-2);
+    border: 1px solid var(--c-border); border-radius: 6px; color: var(--c-text);
+    font-family: var(--font-mono); font-size: 0.9rem; appearance: none; transition: border-color 0.15s;
+  }
+  .gc-field select:focus, .gc-field input:focus { outline: none; border-color: var(--c-action); }
+  .gc-field .gc-unit { font-size: 0.73rem; color: var(--c-muted); margin-block-start: 0.3rem; font-family: var(--font-mono); }
+  .gc-two { display: grid; grid-template-columns: 2fr 1fr; gap: 0.85rem; }
+
+  .gc-btn {
+    width: 100%; padding: 0.8rem; background: var(--c-action); color: #0f1a0d; border: none;
+    border-radius: 6px; font-family: var(--font-sans); font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; transition: background 0.15s; margin-block-start: 0.5rem;
+  }
+  .gc-btn:hover { background: var(--c-action-dark); }
+
+  /* Dual result — Scope 2 must report both methods */
+  .gc-dual { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-block-end: 1.1rem; }
+  .gc-dual-cell {
+    text-align: center; padding: 1.25rem 0.75rem; background: var(--c-surface-2);
+    border-radius: var(--radius); border: 1px solid var(--c-border);
+  }
+  .gc-dual-cell.is-market { border-color: rgba(91,169,212,0.35); }
+  .gc-dual-label { font-size: 0.66rem; color: var(--c-muted); letter-spacing: 0.06em; text-transform: uppercase; margin-block-end: 0.5rem; }
+  .gc-dual-value {
+    font-family: var(--font-mono); font-size: clamp(1.4rem, 4.5vw, 1.9rem); font-weight: 500;
+    color: var(--c-action); font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .gc-dual-cell.is-market .gc-dual-value { color: var(--c-alt); }
+  .gc-dual-unit { font-family: var(--font-mono); font-size: 0.72rem; color: var(--c-muted); margin-block-start: 0.4rem; }
+
+  .gc-breakdown { border-top: 1px solid var(--c-border); padding-block-start: 1rem; }
+  .gc-breakdown h3 { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-muted); margin-block-end: 0.75rem; }
+  .gc-breakdown-row {
+    display: flex; justify-content: space-between; align-items: center; padding-block: 0.35rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem; gap: 1rem;
+  }
+  .gc-breakdown-row:last-child { border-bottom: none; }
+  .gc-breakdown-key { color: var(--c-muted); }
+  .gc-breakdown-val { font-family: var(--font-mono); font-size: 0.82rem; font-variant-numeric: tabular-nums; color: var(--c-text); text-align: right; }
+  .gc-breakdown-val.loc { color: var(--c-action); }
+  .gc-breakdown-val.mkt { color: var(--c-alt); }
+
+  .gc-empty { font-family: var(--font-mono); font-size: 1.1rem; color: var(--c-muted); text-align: center; padding: 2rem 0; }
+
+  .gc-livelink {
+    display: block; margin-block-start: 1.1rem; padding: 0.7rem 1rem; text-align: center;
+    border: 1px dashed var(--c-border); border-radius: 6px; font-size: 0.82rem;
+    color: var(--c-action); text-decoration: none; transition: 0.15s;
+  }
+  .gc-livelink:hover { border-color: var(--c-action); background: rgba(4,191,98,0.06); }
+
+  .gc-insight {
+    margin-block-start: 2rem; padding: 1rem 1.25rem; background: var(--c-surface);
+    border-left: 3px solid var(--c-action); border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 0.85rem; color: var(--c-muted); line-height: 1.6;
+  }
+  .gc-insight strong { color: var(--c-text); }
+  .gc-insight code { font-family: var(--font-mono); color: var(--c-mono); font-size: 0.85em; }
+
+  .gc-footer {
+    margin-block-start: 2.5rem; padding-block-start: 1.5rem; border-top: 1px solid var(--c-border);
+    font-size: 0.78rem; color: var(--c-muted); display: flex; flex-wrap: wrap;
+    gap: 0.5rem 1.5rem; align-items: center; line-height: 1.7;
+  }
+  .gc-footer a { color: var(--c-action); text-decoration: none; }
+  .gc-footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="gc-wrap">
+
+  <nav class="gc-nav">
+    <a href="./index.html">← All calculators</a>
+    <span>/</span>
+    <span>Scope 2 Electricity</span>
+  </nav>
+
+  <header class="gc-header">
+    <div class="gc-wordmark"><a href="https://greencalculus.com">GreenCalculus</a></div>
+    <h1>Scope 2 Electricity Calculator</h1>
+    <p>Purchased electricity is reported <strong>two ways at once</strong> under the GHG Protocol
+       Scope 2 Guidance: the <strong>location-based</strong> method uses the average grid factor for
+       where you consume power, while the <strong>market-based</strong> method reflects the contractual
+       instruments you buy — RECs, GOs, REGOs, I-RECs or a PPA. Enter consumption, pick a grid, choose
+       an instrument, and see both numbers side by side.</p>
+    <div class="gc-badges">
+      <span class="gc-badge">GHG Protocol Scope 2</span>
+      <span class="gc-badge">Dual reporting</span>
+      <span class="gc-badge">EAC / PPA</span>
+      <span class="gc-badge">Vanilla JS</span>
+    </div>
+  </header>
+
+  <div class="gc-calc">
+
+    <!-- INPUTS -->
+    <div class="gc-panel">
+      <h2>Inputs</h2>
+
+      <div class="gc-field">
+        <label for="qty">Electricity consumed</label>
+        <div class="gc-two">
+          <input type="number" id="qty" min="0" step="any" placeholder="0">
+          <select id="unit">
+            <option value="1">MWh</option>
+            <option value="0.001">kWh</option>
+            <option value="1000">GWh</option>
+          </select>
+        </div>
+        <div class="gc-unit">Metered grid electricity for the reporting period.</div>
+      </div>
+
+      <div class="gc-field">
+        <label for="grid">Grid region (location-based)</label>
+        <select id="grid" onchange="onGridChange()"></select>
+        <div class="gc-unit" id="gridNote"></div>
+      </div>
+
+      <div class="gc-field">
+        <label for="instrument">Market-based instrument</label>
+        <select id="instrument" onchange="onInstrumentChange()">
+          <option value="none">No instrument — residual mix</option>
+          <option value="eac">EACs (RECs / GOs / REGOs / I-RECs)</option>
+          <option value="ppa">PPA / on-site renewable</option>
+          <option value="supplier">Supplier-specific factor</option>
+        </select>
+        <div class="gc-unit" id="instrNote">Without a tracked instrument, the market-based method uses the residual mix.</div>
+      </div>
+
+      <div class="gc-field" id="coverageWrap" style="display:none;">
+        <label for="coverage">Renewable coverage</label>
+        <input type="number" id="coverage" min="0" max="100" step="any" value="100">
+        <div class="gc-unit">% of consumption matched by certificates / PPA (uncovered share falls back to residual mix).</div>
+      </div>
+
+      <div class="gc-field" id="supplierWrap" style="display:none;">
+        <label for="supplier">Supplier-specific factor</label>
+        <input type="number" id="supplier" min="0" step="any" placeholder="0.000">
+        <div class="gc-unit">kg CO₂e / kWh — from a residual-mix-adjusted supplier disclosure.</div>
+      </div>
+
+      <button class="gc-btn" onclick="calculate()">Calculate Scope 2</button>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="gc-panel">
+      <h2>Results</h2>
+
+      <div class="gc-dual">
+        <div class="gc-dual-cell">
+          <div class="gc-dual-label">Location-based</div>
+          <div class="gc-dual-value" id="rvLoc"><span class="gc-empty">—</span></div>
+          <div class="gc-dual-unit" id="ruLoc"></div>
+        </div>
+        <div class="gc-dual-cell is-market">
+          <div class="gc-dual-label">Market-based</div>
+          <div class="gc-dual-value" id="rvMkt"><span class="gc-empty">—</span></div>
+          <div class="gc-dual-unit" id="ruMkt"></div>
+        </div>
+      </div>
+
+      <div class="gc-breakdown" id="breakdown" style="display:none;">
+        <h3>Calculation breakdown</h3>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Consumption</span><span class="gc-breakdown-val" id="bd-qty">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Grid factor (location)</span><span class="gc-breakdown-val loc" id="bd-loc-f">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Location-based emissions</span><span class="gc-breakdown-val loc" id="bd-loc-e">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Instrument</span><span class="gc-breakdown-val" id="bd-instr">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Residual mix factor</span><span class="gc-breakdown-val" id="bd-res">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Market factor (effective)</span><span class="gc-breakdown-val mkt" id="bd-mkt-f">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Market-based emissions</span><span class="gc-breakdown-val mkt" id="bd-mkt-e">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">GWP basis</span><span class="gc-breakdown-val">IPCC AR6 GWP-100</span></div>
+      </div>
+
+      <a class="gc-livelink" id="liveLink" href="https://greencalculus.com/calculators/scope-2-electricity-calculator/" style="display:none;">Open the full Scope 2 tool on GreenCalculus.com ↗</a>
+    </div>
+  </div>
+
+  <div class="gc-insight">
+    <strong>Why two numbers:</strong>
+    The GHG Protocol Scope 2 Guidance requires companies in markets with energy attribute certificates to
+    report <strong>both</strong> a location-based and a market-based figure. Location-based reflects the
+    physics of the grid you draw from; market-based reflects your purchasing choices —
+    <code>market = covered share × 0 + uncovered share × residual mix</code>. Buying high-quality EACs or a
+    PPA drives the <em>market-based</em> number toward zero but leaves the <em>location-based</em> number
+    unchanged. Grid and residual-mix factors here are illustrative; the live tool reads live factors from
+    the Master Brain data layer (IEA / Ember location factors, AIB &amp; EPA residual mixes) and applies the
+    Scope 2 Quality Criteria to each instrument.
+  </div>
+
+  <footer class="gc-footer">
+    <span>Live version: <a href="https://greencalculus.com/calculators/scope-2-electricity-calculator/">Open the full calculator on GreenCalculus.com ↗</a></span>
+    <span>Methodology: <a href="https://github.com/greencalculus/greencalculus-methodology">greencalculus-methodology</a></span>
+    <span>Standard: GHG Protocol Scope 2 Guidance</span>
+    <span>Factors: IEA / Ember · AIB / EPA residual mix</span>
+  </footer>
+
+</div>
+
+<script>
+  // Illustrative location-based grid factors and residual-mix factors (kg CO2e / kWh).
+  // The live tool reads live factors from the Master Brain (IEA / Ember location factors,
+  // AIB European Residual Mix and EPA eGRID residual mix). Where no certificate-tracking
+  // system exists, the residual mix equals the grid factor.
+  const GRIDS = {
+    uk:        { label: 'United Kingdom',      loc: 0.207, res: 0.450, note: 'DESNZ location factor; UK residual mix is high after REGO exports.' },
+    eu27:      { label: 'EU-27 average',       loc: 0.230, res: 0.340, note: 'AIB European Attribute Mix residual factor.' },
+    france:    { label: 'France',              loc: 0.056, res: 0.075, note: 'Nuclear-dominated grid — among the lowest in Europe.' },
+    germany:   { label: 'Germany',             loc: 0.363, res: 0.480, note: 'Coal + gas still material; residual mix above grid.' },
+    poland:    { label: 'Poland',              loc: 0.657, res: 0.712, note: 'Hard-coal dominated grid.' },
+    norway:    { label: 'Norway',              loc: 0.028, res: 0.360, note: 'Hydro grid, but GO exports lift the residual mix sharply.' },
+    us:        { label: 'United States (avg)', loc: 0.371, res: 0.420, note: 'EPA eGRID national average; residual mix via Green-e.' },
+    canada:    { label: 'Canada',              loc: 0.120, res: 0.160, note: 'Hydro-heavy; provincial spread is wide.' },
+    australia: { label: 'Australia',           loc: 0.660, res: 0.660, note: 'No mandatory residual-mix system — defaults to grid.' },
+    china:     { label: 'China',               loc: 0.582, res: 0.582, note: 'No residual-mix tracking — market = grid.' },
+    india:     { label: 'India',               loc: 0.713, res: 0.713, note: 'No residual-mix tracking — market = grid.' },
+  };
+
+  const INSTRUMENTS = {
+    none:     { label: 'No instrument (residual mix)', note: 'Without a tracked instrument, the market-based method uses the residual mix.' },
+    eac:      { label: 'EACs (RECs/GOs/REGOs/I-RECs)', note: 'Certificates must meet the Scope 2 Quality Criteria and be retired for the reporting year.' },
+    ppa:      { label: 'PPA / on-site renewable',      note: 'Power purchase agreement or self-generation, evidenced by bundled or unbundled certificates.' },
+    supplier: { label: 'Supplier-specific factor',     note: 'Contractual factor from a supplier disclosure (must be residual-mix adjusted).' },
+  };
+
+  // --- Init dropdowns ---
+  (function init() {
+    const grid = document.getElementById('grid');
+    for (const k in GRIDS) {
+      const o = document.createElement('option');
+      o.value = k; o.textContent = GRIDS[k].label;
+      grid.appendChild(o);
+    }
+    grid.value = 'uk';
+    onGridChange();
+  })();
+
+  function onGridChange() {
+    document.getElementById('gridNote').textContent = GRIDS[document.getElementById('grid').value].note;
+  }
+
+  function onInstrumentChange() {
+    const key = document.getElementById('instrument').value;
+    document.getElementById('instrNote').textContent = INSTRUMENTS[key].note;
+    document.getElementById('coverageWrap').style.display = (key === 'eac' || key === 'ppa') ? 'block' : 'none';
+    document.getElementById('supplierWrap').style.display = (key === 'supplier') ? 'block' : 'none';
+  }
+
+  const fmt = (n, d) => n.toLocaleString(undefined, { maximumFractionDigits: d });
+  const fmtT = (n) => Math.abs(n) >= 1 ? fmt(n, 2) : fmt(n, 4);
+
+  function calculate() {
+    const qtyRaw = parseFloat(document.getElementById('qty').value) || 0;
+    const toMWh  = parseFloat(document.getElementById('unit').value);   // factor to convert input → MWh
+    const mwh    = qtyRaw * toMWh;
+    const kwh    = mwh * 1000;
+    const g      = GRIDS[document.getElementById('grid').value];
+    const instrKey = document.getElementById('instrument').value;
+
+    if (qtyRaw <= 0) {
+      ['rvLoc','rvMkt'].forEach(id => document.getElementById(id).innerHTML = '<span class="gc-empty">—</span>');
+      document.getElementById('ruLoc').textContent = '';
+      document.getElementById('ruMkt').textContent = '';
+      document.getElementById('breakdown').style.display = 'none';
+      document.getElementById('liveLink').style.display = 'none';
+      return;
+    }
+
+    // Location-based: always the grid factor.
+    const locT = kwh * g.loc / 1000;
+
+    // Market-based: depends on the instrument.
+    let mktFactor;          // effective kg CO2e / kWh
+    let coverage = 0;
+    if (instrKey === 'supplier') {
+      mktFactor = parseFloat(document.getElementById('supplier').value) || 0;
+    } else if (instrKey === 'eac' || instrKey === 'ppa') {
+      coverage = Math.min(100, Math.max(0, parseFloat(document.getElementById('coverage').value) || 0)) / 100;
+      mktFactor = (1 - coverage) * g.res;   // covered share is zero-emission; remainder at residual mix
+    } else {
+      mktFactor = g.res;     // no instrument → full residual mix
+    }
+    const mktT = kwh * mktFactor / 1000;
+
+    // --- Dual result ---
+    document.getElementById('rvLoc').textContent = fmtT(locT);
+    document.getElementById('ruLoc').textContent = 'tCO₂e';
+    document.getElementById('rvMkt').textContent = fmtT(mktT);
+    document.getElementById('ruMkt').textContent = 'tCO₂e';
+
+    // --- Breakdown ---
+    document.getElementById('bd-qty').textContent   = fmt(mwh, 2) + ' MWh';
+    document.getElementById('bd-loc-f').textContent = g.loc.toFixed(3) + ' kg/kWh';
+    document.getElementById('bd-loc-e').textContent = fmtT(locT) + ' tCO₂e';
+    document.getElementById('bd-instr').textContent = INSTRUMENTS[instrKey].label
+      + ((instrKey === 'eac' || instrKey === 'ppa') ? ' · ' + fmt(coverage * 100, 0) + '%' : '');
+    document.getElementById('bd-res').textContent   = (instrKey === 'supplier') ? 'n/a' : g.res.toFixed(3) + ' kg/kWh';
+    document.getElementById('bd-mkt-f').textContent = mktFactor.toFixed(3) + ' kg/kWh';
+    document.getElementById('bd-mkt-e').textContent = fmtT(mktT) + ' tCO₂e';
+
+    document.getElementById('breakdown').style.display = 'block';
+    document.getElementById('liveLink').style.display  = 'block';
+  }
+
+  document.getElementById('qty').addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+</script>
+</body>
+</html>
