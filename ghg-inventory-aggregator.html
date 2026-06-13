@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GHG Inventory Aggregator (Scope 1+2+3) — GreenCalculus</title>
+<meta name="description" content="Consolidate Scope 1, Scope 2 and Scope 3 into one auditable corporate GHG inventory in tCO2e, with dual location-based and market-based totals and the scope split. GHG Protocol Corporate Standard. Free demo by GreenCalculus.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --c-trust: #1D3215;
+    --c-action: #04BF62;
+    --c-action-dark: #03a554;
+    --c-bg: #0f1a0d;
+    --c-surface: #1a2e17;
+    --c-surface-2: #213820;
+    --c-border: rgba(4,191,98,0.15);
+    --c-text: #e8f5e2;
+    --c-muted: #7a9b72;
+    --c-mono: #a8d4a0;
+    --c-s1: #04BF62;
+    --c-s2: #5BA9D4;
+    --c-s3: #D4860B;
+    --radius: 10px;
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans); background: var(--c-bg); color: var(--c-text);
+    min-height: 100vh; padding: clamp(1rem, 4vw, 2rem);
+  }
+  .gc-wrap { max-width: 960px; margin-inline: auto; }
+
+  .gc-nav {
+    display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem;
+    font-family: var(--font-mono); color: var(--c-muted); margin-block-end: 1.5rem;
+  }
+  .gc-nav a { color: var(--c-action); text-decoration: none; }
+  .gc-nav a:hover { text-decoration: underline; }
+  .gc-nav span { color: var(--c-muted); }
+
+  .gc-header { margin-block-end: 2rem; padding-block-end: 1.5rem; border-bottom: 1px solid var(--c-border); }
+  .gc-wordmark {
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--c-action); margin-block-end: 0.5rem;
+  }
+  .gc-wordmark a { color: inherit; text-decoration: none; }
+  .gc-header h1 { font-size: clamp(1.25rem, 3vw, 1.75rem); font-weight: 600; line-height: 1.2; margin-block-end: 0.5rem; }
+  .gc-header p { font-size: 0.9rem; color: var(--c-muted); line-height: 1.6; }
+  .gc-header code { font-family: var(--font-mono); color: var(--c-mono); font-size: 0.85em; }
+  .gc-badges { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-start: 0.75rem; }
+  .gc-badge {
+    font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px;
+    background: var(--c-surface-2); border: 1px solid var(--c-border); color: var(--c-mono);
+  }
+
+  .gc-calc { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+  @media (max-width: 700px) { .gc-calc { grid-template-columns: 1fr; } }
+
+  .gc-panel { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius); padding: 1.5rem; }
+  .gc-panel > h2 {
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--c-muted); margin-block-end: 1.25rem;
+  }
+
+  .gc-group-label { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-action); margin: 1.4rem 0 0.7rem; }
+  .gc-group-label:first-of-type { margin-block-start: 0; }
+
+  .gc-field { margin-block-end: 0.9rem; }
+  .gc-field label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--c-muted); margin-block-end: 0.35rem; }
+  .gc-field input {
+    width: 100%; padding: 0.55rem 0.8rem; background: var(--c-surface-2);
+    border: 1px solid var(--c-border); border-radius: 6px; color: var(--c-text);
+    font-family: var(--font-mono); font-size: 0.88rem; appearance: none; transition: border-color 0.15s;
+  }
+  .gc-field input:focus { outline: none; border-color: var(--c-action); }
+  .gc-field .gc-unit { font-size: 0.72rem; color: var(--c-muted); margin-block-start: 0.3rem; font-family: var(--font-mono); }
+
+  .gc-toggle { display: flex; gap: 0; border: 1px solid var(--c-border); border-radius: 6px; overflow: hidden; }
+  .gc-toggle button {
+    flex: 1; padding: 0.5rem; background: var(--c-surface-2); color: var(--c-muted);
+    border: none; font-family: var(--font-mono); font-size: 0.78rem; cursor: pointer; transition: 0.15s;
+  }
+  .gc-toggle button.is-active { background: var(--c-action); color: #0f1a0d; font-weight: 600; }
+
+  .gc-btn {
+    width: 100%; padding: 0.8rem; background: var(--c-action); color: #0f1a0d; border: none;
+    border-radius: 6px; font-family: var(--font-sans); font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; transition: background 0.15s; margin-block-start: 0.75rem;
+  }
+  .gc-btn:hover { background: var(--c-action-dark); }
+
+  /* Dual grand totals */
+  .gc-dual { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-block-end: 1.1rem; }
+  .gc-dual-cell {
+    text-align: center; padding: 1.25rem 0.75rem; background: var(--c-surface-2);
+    border-radius: var(--radius); border: 1px solid var(--c-border); transition: border-color 0.15s;
+  }
+  .gc-dual-cell.is-basis { border-color: rgba(4,191,98,0.55); }
+  .gc-dual-label { font-size: 0.66rem; color: var(--c-muted); letter-spacing: 0.06em; text-transform: uppercase; margin-block-end: 0.5rem; }
+  .gc-dual-value {
+    font-family: var(--font-mono); font-size: clamp(1.4rem, 4.5vw, 1.9rem); font-weight: 500;
+    color: var(--c-action); font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .gc-dual-unit { font-family: var(--font-mono); font-size: 0.72rem; color: var(--c-muted); margin-block-start: 0.4rem; }
+
+  /* Scope-split stacked bar */
+  .gc-split { margin-block-end: 1.1rem; }
+  .gc-split h3 { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-muted); margin-block-end: 0.6rem; }
+  .gc-bar { display: flex; height: 1.6rem; border-radius: 6px; overflow: hidden; background: var(--c-surface-2); border: 1px solid var(--c-border); }
+  .gc-bar-seg { transition: width 0.3s; min-width: 0; }
+  .gc-bar-seg.s1 { background: var(--c-s1); }
+  .gc-bar-seg.s2 { background: var(--c-s2); }
+  .gc-bar-seg.s3 { background: var(--c-s3); }
+  .gc-legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; margin-block-start: 0.6rem; font-size: 0.74rem; color: var(--c-muted); font-family: var(--font-mono); }
+  .gc-legend span { display: inline-flex; align-items: center; gap: 0.35rem; }
+  .gc-dot { width: 0.7rem; height: 0.7rem; border-radius: 2px; display: inline-block; }
+  .gc-dot.s1 { background: var(--c-s1); } .gc-dot.s2 { background: var(--c-s2); } .gc-dot.s3 { background: var(--c-s3); }
+
+  .gc-breakdown { border-top: 1px solid var(--c-border); padding-block-start: 1rem; }
+  .gc-breakdown h3 { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-muted); margin-block-end: 0.75rem; }
+  .gc-breakdown-row {
+    display: flex; justify-content: space-between; align-items: center; padding-block: 0.35rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem; gap: 1rem;
+  }
+  .gc-breakdown-row:last-child { border-bottom: none; }
+  .gc-breakdown-row.is-total { border-top: 1px solid var(--c-border); margin-block-start: 0.3rem; padding-block-start: 0.6rem; }
+  .gc-breakdown-key { color: var(--c-muted); }
+  .gc-breakdown-val { font-family: var(--font-mono); font-size: 0.82rem; font-variant-numeric: tabular-nums; color: var(--c-text); text-align: right; }
+  .gc-breakdown-val.pos { color: var(--c-action); }
+
+  .gc-empty { font-family: var(--font-mono); font-size: 1.1rem; color: var(--c-muted); text-align: center; padding: 2rem 0; }
+
+  .gc-livelink {
+    display: block; margin-block-start: 1.1rem; padding: 0.7rem 1rem; text-align: center;
+    border: 1px dashed var(--c-border); border-radius: 6px; font-size: 0.82rem;
+    color: var(--c-action); text-decoration: none; transition: 0.15s;
+  }
+  .gc-livelink:hover { border-color: var(--c-action); background: rgba(4,191,98,0.06); }
+
+  /* Drill-down links to the per-scope demos */
+  .gc-drill { margin-block-start: 2.5rem; }
+  .gc-drill h2 { font-size: 0.9rem; font-weight: 600; margin-block-end: 0.4rem; }
+  .gc-drill > p { font-size: 0.85rem; color: var(--c-muted); margin-block-end: 1.1rem; line-height: 1.6; }
+  .gc-drill-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.6rem; }
+  .gc-spoke {
+    display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;
+    padding: 0.7rem 0.9rem; background: var(--c-surface); border: 1px solid var(--c-border);
+    border-radius: 8px; text-decoration: none; color: var(--c-text); font-size: 0.83rem; transition: 0.15s;
+  }
+  .gc-spoke:hover { border-color: rgba(4,191,98,0.4); transform: translateY(-1px); }
+  .gc-spoke .arr { color: var(--c-action); font-family: var(--font-mono); }
+
+  .gc-insight {
+    margin-block-start: 2.5rem; padding: 1rem 1.25rem; background: var(--c-surface);
+    border-left: 3px solid var(--c-action); border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 0.85rem; color: var(--c-muted); line-height: 1.6;
+  }
+  .gc-insight strong { color: var(--c-text); }
+  .gc-insight code { font-family: var(--font-mono); color: var(--c-mono); font-size: 0.85em; }
+
+  .gc-footer {
+    margin-block-start: 2.5rem; padding-block-start: 1.5rem; border-top: 1px solid var(--c-border);
+    font-size: 0.78rem; color: var(--c-muted); display: flex; flex-wrap: wrap;
+    gap: 0.5rem 1.5rem; align-items: center; line-height: 1.7;
+  }
+  .gc-footer a { color: var(--c-action); text-decoration: none; }
+  .gc-footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="gc-wrap">
+
+  <nav class="gc-nav">
+    <a href="./index.html">← All calculators</a>
+    <span>/</span>
+    <span>GHG Inventory Aggregator</span>
+  </nav>
+
+  <header class="gc-header">
+    <div class="gc-wordmark"><a href="https://greencalculus.com">GreenCalculus</a></div>
+    <h1>GHG Inventory Aggregator — Scope 1 + 2 + 3</h1>
+    <p>The capstone of a corporate carbon inventory: roll up the three scopes into one auditable total.
+       Because Scope 2 is reported two ways, the inventory carries <strong>two grand totals</strong> —
+       <code>location-based = S1 + S2(location) + S3</code> and <code>market-based = S1 + S2(market) + S3</code>.
+       Enter your subtotals, pick the headline basis, and see the scope split — including how much of your
+       footprint sits in the value chain.</p>
+    <div class="gc-badges">
+      <span class="gc-badge">GHG Protocol Corporate</span>
+      <span class="gc-badge">Scope 1 + 2 + 3</span>
+      <span class="gc-badge">Dual totals</span>
+      <span class="gc-badge">Vanilla JS</span>
+    </div>
+  </header>
+
+  <div class="gc-calc">
+
+    <!-- INPUTS -->
+    <div class="gc-panel">
+      <h2>Inputs · tCO₂e</h2>
+
+      <div class="gc-group-label">Scope 1 — direct</div>
+      <div class="gc-field">
+        <label for="s1">Scope 1 total</label>
+        <input type="number" id="s1" min="0" step="any" placeholder="0">
+        <div class="gc-unit">Combustion, mobile, fugitive / refrigerants.</div>
+      </div>
+
+      <div class="gc-group-label">Scope 2 — purchased energy</div>
+      <div class="gc-field">
+        <label for="s2loc">Scope 2 — location-based</label>
+        <input type="number" id="s2loc" min="0" step="any" placeholder="0">
+      </div>
+      <div class="gc-field">
+        <label for="s2mkt">Scope 2 — market-based</label>
+        <input type="number" id="s2mkt" min="0" step="any" placeholder="0">
+        <div class="gc-unit">After EACs / PPAs. Often lower than location-based.</div>
+      </div>
+
+      <div class="gc-group-label">Scope 3 — value chain</div>
+      <div class="gc-field">
+        <label for="cat1">Cat 1 · Purchased goods &amp; services</label>
+        <input type="number" id="cat1" min="0" step="any" placeholder="0">
+      </div>
+      <div class="gc-field">
+        <label for="cat4">Cat 4 · Upstream transport &amp; distribution</label>
+        <input type="number" id="cat4" min="0" step="any" placeholder="0">
+      </div>
+      <div class="gc-field">
+        <label for="cat6">Cat 6 · Business travel</label>
+        <input type="number" id="cat6" min="0" step="any" placeholder="0">
+      </div>
+      <div class="gc-field">
+        <label for="cat11">Cat 11 · Use of sold products</label>
+        <input type="number" id="cat11" min="0" step="any" placeholder="0">
+      </div>
+      <div class="gc-field">
+        <label for="catOther">Other Scope 3 (Cat 2, 3, 5, 7–10, 12–15)</label>
+        <input type="number" id="catOther" min="0" step="any" placeholder="0">
+      </div>
+
+      <div class="gc-group-label">Headline reporting basis</div>
+      <div class="gc-toggle" id="basis">
+        <button type="button" data-basis="location" class="is-active">Location-based</button>
+        <button type="button" data-basis="market">Market-based</button>
+      </div>
+
+      <button class="gc-btn" onclick="calculate()">Consolidate Inventory</button>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="gc-panel">
+      <h2>Consolidated inventory</h2>
+
+      <div class="gc-dual">
+        <div class="gc-dual-cell is-basis" id="cellLoc">
+          <div class="gc-dual-label">Total — location-based</div>
+          <div class="gc-dual-value" id="rvLoc"><span class="gc-empty">—</span></div>
+          <div class="gc-dual-unit" id="ruLoc"></div>
+        </div>
+        <div class="gc-dual-cell" id="cellMkt">
+          <div class="gc-dual-label">Total — market-based</div>
+          <div class="gc-dual-value" id="rvMkt"><span class="gc-empty">—</span></div>
+          <div class="gc-dual-unit" id="ruMkt"></div>
+        </div>
+      </div>
+
+      <div class="gc-split" id="split" style="display:none;">
+        <h3>Scope split <span id="splitBasis" style="text-transform:none;letter-spacing:0;"></span></h3>
+        <div class="gc-bar">
+          <div class="gc-bar-seg s1" id="segS1"></div>
+          <div class="gc-bar-seg s2" id="segS2"></div>
+          <div class="gc-bar-seg s3" id="segS3"></div>
+        </div>
+        <div class="gc-legend">
+          <span><span class="gc-dot s1"></span>Scope 1 · <span id="pctS1">—</span></span>
+          <span><span class="gc-dot s2"></span>Scope 2 · <span id="pctS2">—</span></span>
+          <span><span class="gc-dot s3"></span>Scope 3 · <span id="pctS3">—</span></span>
+        </div>
+      </div>
+
+      <div class="gc-breakdown" id="breakdown" style="display:none;">
+        <h3>Inventory breakdown</h3>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Scope 1</span><span class="gc-breakdown-val" id="bd-s1">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Scope 2 — location-based</span><span class="gc-breakdown-val" id="bd-s2loc">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Scope 2 — market-based</span><span class="gc-breakdown-val" id="bd-s2mkt">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Scope 3 — total</span><span class="gc-breakdown-val" id="bd-s3">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Scope 3 share of total</span><span class="gc-breakdown-val" id="bd-s3share">—</span></div>
+        <div class="gc-breakdown-row is-total"><span class="gc-breakdown-key">Total — location-based</span><span class="gc-breakdown-val pos" id="bd-tloc">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Total — market-based</span><span class="gc-breakdown-val pos" id="bd-tmkt">—</span></div>
+      </div>
+
+      <a class="gc-livelink" id="liveLink" href="https://greencalculus.com/calculators/ghg-inventory-aggregator-scope123-calculator/" style="display:none;">Open the full inventory aggregator on GreenCalculus.com ↗</a>
+    </div>
+  </div>
+
+  <!-- DRILL-DOWN -->
+  <section class="gc-drill">
+    <h2>Build each scope first</h2>
+    <p>This aggregator consolidates the outputs of the per-scope calculators. Use these demos to produce each
+       subtotal, then bring them back here — or run the full tool on GreenCalculus.com, which pulls every
+       category straight from your activity data.</p>
+    <div class="gc-drill-grid">
+      <a class="gc-spoke" href="./stationary-combustion.html"><span>🔥 Scope 1 · Combustion</span><span class="arr">→</span></a>
+      <a class="gc-spoke" href="./scope-2-electricity.html"><span>⚡ Scope 2 · Electricity</span><span class="arr">→</span></a>
+      <a class="gc-spoke" href="./scope-3-business-travel.html"><span>✈️ Scope 3 · Value chain</span><span class="arr">→</span></a>
+    </div>
+  </section>
+
+  <div class="gc-insight">
+    <strong>Why Scope 3 usually dominates:</strong>
+    For most companies the value chain is <strong>70–90%</strong> of the total footprint — which is why the
+    split bar matters more than any single number. The two grand totals differ only in the Scope 2 line:
+    location-based reflects the grid, market-based reflects your energy contracts, and the
+    <strong>same Scope 1 and Scope 3 flow into both</strong>. Disclosure frameworks (CSRD/ESRS E1, SECR,
+    IFRS S2, CDP) expect this consolidated inventory with the dual Scope 2 totals shown — the live
+    aggregator emits it with full audit trails and schema-aligned exports.
+  </div>
+
+  <footer class="gc-footer">
+    <span>Live tool: <a href="https://greencalculus.com/calculators/ghg-inventory-aggregator-scope123-calculator/">GHG Inventory Aggregator on GreenCalculus.com ↗</a></span>
+    <span>Methodology: <a href="https://github.com/greencalculus/greencalculus-methodology">greencalculus-methodology</a></span>
+    <span>Standard: GHG Protocol Corporate Standard — Scopes 1, 2 &amp; 3</span>
+  </footer>
+
+</div>
+
+<script>
+  let basis = 'location';
+
+  // Basis toggle
+  document.querySelectorAll('#basis button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#basis button').forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      basis = btn.dataset.basis;
+      calculate();
+    });
+  });
+
+  const num = id => parseFloat(document.getElementById(id).value) || 0;
+  const fmt = (n, d) => n.toLocaleString(undefined, { maximumFractionDigits: d });
+  const fmtT = (n) => Math.abs(n) >= 1 ? fmt(n, 1) : fmt(n, 3);
+  const pct = (n) => (n * 100).toFixed(1) + '%';
+
+  function calculate() {
+    const s1    = num('s1');
+    const s2loc = num('s2loc');
+    const s2mkt = num('s2mkt');
+    const s3    = num('cat1') + num('cat4') + num('cat6') + num('cat11') + num('catOther');
+
+    const totalLoc = s1 + s2loc + s3;
+    const totalMkt = s1 + s2mkt + s3;
+
+    if (totalLoc <= 0 && totalMkt <= 0) {
+      ['rvLoc','rvMkt'].forEach(id => document.getElementById(id).innerHTML = '<span class="gc-empty">—</span>');
+      document.getElementById('ruLoc').textContent = '';
+      document.getElementById('ruMkt').textContent = '';
+      ['split','breakdown'].forEach(id => document.getElementById(id).style.display = 'none');
+      document.getElementById('liveLink').style.display = 'none';
+      return;
+    }
+
+    // --- Dual totals + which is the headline basis ---
+    document.getElementById('rvLoc').textContent = fmtT(totalLoc);
+    document.getElementById('ruLoc').textContent = 'tCO₂e';
+    document.getElementById('rvMkt').textContent = fmtT(totalMkt);
+    document.getElementById('ruMkt').textContent = 'tCO₂e';
+    document.getElementById('cellLoc').classList.toggle('is-basis', basis === 'location');
+    document.getElementById('cellMkt').classList.toggle('is-basis', basis === 'market');
+
+    // --- Scope split on the selected basis ---
+    const s2 = basis === 'location' ? s2loc : s2mkt;
+    const total = basis === 'location' ? totalLoc : totalMkt;
+    const fS1 = total > 0 ? s1 / total : 0;
+    const fS2 = total > 0 ? s2 / total : 0;
+    const fS3 = total > 0 ? s3 / total : 0;
+
+    document.getElementById('segS1').style.width = (fS1 * 100) + '%';
+    document.getElementById('segS2').style.width = (fS2 * 100) + '%';
+    document.getElementById('segS3').style.width = (fS3 * 100) + '%';
+    document.getElementById('pctS1').textContent = pct(fS1);
+    document.getElementById('pctS2').textContent = pct(fS2);
+    document.getElementById('pctS3').textContent = pct(fS3);
+    document.getElementById('splitBasis').textContent = '(' + basis + '-based)';
+    document.getElementById('split').style.display = 'block';
+
+    // --- Breakdown ---
+    document.getElementById('bd-s1').textContent      = fmtT(s1) + ' tCO₂e';
+    document.getElementById('bd-s2loc').textContent   = fmtT(s2loc) + ' tCO₂e';
+    document.getElementById('bd-s2mkt').textContent   = fmtT(s2mkt) + ' tCO₂e';
+    document.getElementById('bd-s3').textContent      = fmtT(s3) + ' tCO₂e';
+    document.getElementById('bd-s3share').textContent = total > 0 ? pct(fS3) + ' (' + basis + '-based)' : '—';
+    document.getElementById('bd-tloc').textContent    = fmtT(totalLoc) + ' tCO₂e';
+    document.getElementById('bd-tmkt').textContent    = fmtT(totalMkt) + ' tCO₂e';
+    document.getElementById('breakdown').style.display = 'block';
+
+    document.getElementById('liveLink').style.display = 'block';
+  }
+</script>
+</body>
+</html>

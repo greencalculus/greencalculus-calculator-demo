@@ -30,6 +30,7 @@ GHG Protocol and IPCC AR6. Open the demo, or jump straight to the full live calc
 
 | Demo | Scope | Live calculator |
 |---|---|---|
+| 📊 **[GHG Inventory Aggregator](./ghg-inventory-aggregator.html)** | Consolidate Scope 1 + 2 + 3 → dual location/market grand totals + scope split | [Open live ↗](https://greencalculus.com/calculators/ghg-inventory-aggregator-scope123-calculator/) |
 | 🔥 **[Scope 1 Stationary Combustion](./stationary-combustion.html)** | Direct fuel combustion → tCO₂e, 10 fuel types | [Open live ↗](https://greencalculus.com/calculators/scope-1-combustion-calculator/) |
 | ⚡ **[Scope 2 Electricity](./scope-2-electricity.html)** | Purchased electricity → tCO₂e with dual location-based + market-based reporting (EAC/PPA/residual mix) | [Open live ↗](https://greencalculus.com/calculators/scope-2-electricity-calculator/) |
 | ✈️ **[Scope 3 Business Travel](./scope-3-business-travel.html)** | Category 6 air/rail/road/hotel + radiative-forcing uplift; hub to the full Scope 3 value-chain suite | [Open live ↗](https://greencalculus.com/calculators/business-travel-air-calculator/) |
@@ -38,9 +39,22 @@ GHG Protocol and IPCC AR6. Open the demo, or jump straight to the full live calc
 | 💰 **[PCAF Financed Emissions](./pcaf-financed-emissions.html)** | All 7 PCAF Part A asset classes + DQ score; hub to the 10-calc suite | [Open live ↗](https://greencalculus.com/calculators/pcaf-listed-equity-corporate-bonds/) |
 | 🛂 **[CBAM Quarterly Reporting](./cbam-quarterly-reporting.html)** | Embedded emissions + certificate liability across the 6 CBAM goods; hub to the 12-calc disclosure suite | [Open live ↗](https://greencalculus.com/calculators/cbam-quarterly-reporting-calculator/) |
 
-The landing page ([`index.html`](./index.html)) is a gallery linking all seven.
+The landing page ([`index.html`](./index.html)) is a gallery linking all eight.
 
 ---
+
+### 📊 GHG Inventory Aggregator
+
+The capstone of a corporate carbon inventory — consolidates the three scopes into one auditable total.
+Because Scope 2 is reported two ways, the inventory carries **two grand totals**:
+`location-based = S1 + S2(location) + S3` and `market-based = S1 + S2(market) + S3` — the same Scope 1 and
+Scope 3 flow into both, only the Scope 2 line differs. Enter scope subtotals (with Scope 3 split into the
+material categories), pick the headline basis, and get the dual totals, a **scope-split bar**, and the
+**Scope 3 share of total** — which for most companies is 70–90%. This is the consolidated inventory that
+CSRD/ESRS E1, SECR, IFRS S2 and CDP expect.
+
+- **Standard:** GHG Protocol Corporate Standard — Scopes 1, 2 & 3
+- **Method:** inventory consolidation · dual Scope 2 totals · scope-split apportionment
 
 ### 🔥 Scope 1 Stationary Combustion
 
@@ -156,7 +170,7 @@ All emission factors and GWP values are documented in:
 
 ## Full platform
 
-A demo of seven calculators from [GreenCalculus.com](https://greencalculus.com) — the
+A demo of eight calculators from [GreenCalculus.com](https://greencalculus.com) — the
 traceable reference layer for corporate carbon accounting, built for sustainability
 officers, engineers, and CSRD compliance teams.
 
