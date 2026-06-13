@@ -160,6 +160,13 @@
   }
   .gc-footer a { color: var(--c-action); text-decoration: none; }
   .gc-footer a:hover { text-decoration: underline; }
+
+  /* Related references */
+  .gc-refs { margin-block-start: 2.5rem; }
+  .gc-refs h2 { font-size: 0.9rem; font-weight: 600; margin-block-end: 0.4rem; }
+  .gc-refs > p { font-size: 0.85rem; color: var(--c-muted); margin-block-end: 1.25rem; line-height: 1.6; }
+  .gc-refs-group { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-action); margin: 1.25rem 0 0.6rem; }
+  .gc-refs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.6rem; }
 </style>
 </head>
 <body>
@@ -317,6 +324,30 @@
     Default values are illustrative — the live tool uses the Commission's published default-value tables per
     good and country.
   </div>
+
+  <!-- RELATED LIVE PAGES -->
+  <section class="gc-refs">
+    <h2>Related on GreenCalculus.com</h2>
+    <p>The methodology, standards, definitions and related tools behind this calculator — all live on the platform.</p>
+
+    <div class="gc-refs-group">Methodology</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/methodology/cbam-quarterly-reporting-methodology/"><span>CBAM Quarterly Reporting</span><span class="arr">↗</span></a>
+    </div>
+
+    <div class="gc-refs-group">Standards</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/standards/eu-cbam-carbon-border-adjustment/"><span>EU CBAM Regulation</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/standards/eu-ets-emissions-trading-system/"><span>EU ETS</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/standards/csrd-esrs-e1/"><span>CSRD · ESRS E1</span><span class="arr">↗</span></a>
+    </div>
+
+    <div class="gc-refs-group">Glossary</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/co2e-carbon-dioxide-equivalent/"><span>CO₂e</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/scope-1-emissions/"><span>Scope 1 emissions</span><span class="arr">↗</span></a>
+    </div>
+  </section>
 
   <footer class="gc-footer">
     <span>Live tool: <a href="https://greencalculus.com/calculators/cbam-quarterly-reporting-calculator/">CBAM calculator on GreenCalculus.com ↗</a></span>

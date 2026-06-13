@@ -197,6 +197,16 @@
   }
   .gc-footer a { color: var(--c-action); text-decoration: none; }
   .gc-footer a:hover { text-decoration: underline; }
+
+  /* Related references */
+  .gc-refs { margin-block-start: 2.5rem; }
+  .gc-refs h2 { font-size: 0.9rem; font-weight: 600; margin-block-end: 0.4rem; }
+  .gc-refs > p { font-size: 0.85rem; color: var(--c-muted); margin-block-end: 1.25rem; line-height: 1.6; }
+  .gc-refs-group { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-action); margin: 1.25rem 0 0.6rem; }
+  .gc-refs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.6rem; }
+  .gc-spoke { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; padding: 0.7rem 0.9rem; background: var(--c-surface); border: 1px solid var(--c-border); border-radius: 8px; text-decoration: none; color: var(--c-text); font-size: 0.83rem; transition: 0.15s; }
+  .gc-spoke:hover { border-color: rgba(4,191,98,0.4); transform: translateY(-1px); }
+  .gc-spoke .arr { color: var(--c-action); font-family: var(--font-mono); }
 </style>
 </head>
 <body>
@@ -368,6 +378,41 @@
     on distinct inventory lines. Under <strong>SBTi FLAG</strong>, if your land-sector emissions exceed
     <strong>20% of your total GHG inventory</strong>, a separate science-based FLAG target is required.
   </div>
+
+  <!-- RELATED LIVE PAGES -->
+  <section class="gc-refs">
+    <h2>Related on GreenCalculus.com</h2>
+    <p>The methodology, standards, definitions and related tools behind this calculator — all live on the platform.</p>
+
+    <div class="gc-refs-group">Methodology</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/methodology/flag-emissions/"><span>FLAG Emissions</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/methodology/fertiliser-soil-n2o-methodology/"><span>Fertiliser Soil N₂O</span><span class="arr">↗</span></a>
+    </div>
+
+    <div class="gc-refs-group">Standards & data</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/standards/ghg-protocol-land-sector-removals-2026/"><span>GHG Protocol Land Sector & Removals</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/standards/sbti-flag-guidance/"><span>SBTi FLAG Guidance</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/standards/ipcc-2019-refinement-guidelines/"><span>IPCC 2019 Refinement</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/standards/ipcc-ar6/"><span>IPCC AR6</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/data/ipcc-afolu-emission-factors/"><span>IPCC AFOLU Factors</span><span class="arr">↗</span></a>
+    </div>
+
+    <div class="gc-refs-group">Glossary</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/methane-ch4/"><span>Methane (CH₄)</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/nitrous-oxide/"><span>Nitrous oxide</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/co2e-carbon-dioxide-equivalent/"><span>CO₂e</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/global-warming-potential/"><span>Global warming potential</span><span class="arr">↗</span></a>
+    </div>
+
+    <div class="gc-refs-group">Related calculators</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/calculators/afolu-fertiliser-soil-n2o-calculator/"><span>AFOLU Fertiliser N₂O</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/calculators/sbti-near-term-target-calculator/"><span>SBTi Near-Term Target</span><span class="arr">↗</span></a>
+    </div>
+  </section>
 
   <footer class="gc-footer">
     <span>Live version: <a href="https://greencalculus.com/calculators/flag-emissions-calculator/">Open the full calculator on GreenCalculus.com ↗</a></span>

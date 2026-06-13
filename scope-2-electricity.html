@@ -134,6 +134,16 @@
   }
   .gc-footer a { color: var(--c-action); text-decoration: none; }
   .gc-footer a:hover { text-decoration: underline; }
+
+  /* Related references */
+  .gc-refs { margin-block-start: 2.5rem; }
+  .gc-refs h2 { font-size: 0.9rem; font-weight: 600; margin-block-end: 0.4rem; }
+  .gc-refs > p { font-size: 0.85rem; color: var(--c-muted); margin-block-end: 1.25rem; line-height: 1.6; }
+  .gc-refs-group { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-action); margin: 1.25rem 0 0.6rem; }
+  .gc-refs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.6rem; }
+  .gc-spoke { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; padding: 0.7rem 0.9rem; background: var(--c-surface); border: 1px solid var(--c-border); border-radius: 8px; text-decoration: none; color: var(--c-text); font-size: 0.83rem; transition: 0.15s; }
+  .gc-spoke:hover { border-color: rgba(4,191,98,0.4); transform: translateY(-1px); }
+  .gc-spoke .arr { color: var(--c-action); font-family: var(--font-mono); }
 </style>
 </head>
 <body>
@@ -256,6 +266,44 @@
     the Master Brain data layer (IEA / Ember location factors, AIB &amp; EPA residual mixes) and applies the
     Scope 2 Quality Criteria to each instrument.
   </div>
+
+  <!-- RELATED LIVE PAGES -->
+  <section class="gc-refs">
+    <h2>Related on GreenCalculus.com</h2>
+    <p>The methodology, standards, definitions and related tools behind this calculator — all live on the platform.</p>
+
+    <div class="gc-refs-group">Methodology</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/methodology/scope-2-electricity/"><span>Scope 2 Electricity</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/methodology/scope-2-market-based/"><span>Scope 2 Market-Based</span><span class="arr">↗</span></a>
+    </div>
+
+    <div class="gc-refs-group">Standards & data</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/standards/ghg-protocol-scope-2-guidance/"><span>GHG Protocol Scope 2 Guidance</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/standards/aib-european-residual-mix/"><span>AIB European Residual Mix</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/standards/epa-egrid/"><span>EPA eGRID</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/standards/ember-yearly-electricity-data/"><span>Ember Electricity Data</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/standards/re100-technical-criteria/"><span>RE100 Technical Criteria</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/data/grid-electricity-emission-factors/"><span>Grid Electricity Factors</span><span class="arr">↗</span></a>
+    </div>
+
+    <div class="gc-refs-group">Glossary</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/scope-2-location-based/"><span>Location-based</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/scope-2-market-based/"><span>Market-based</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/residual-mix/"><span>Residual mix</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/energy-attribute-certificates/"><span>Energy Attribute Certificates</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/electricity-emission-factor/"><span>Electricity emission factor</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/glossary/scope-2-emissions/"><span>Scope 2 emissions</span><span class="arr">↗</span></a>
+    </div>
+
+    <div class="gc-refs-group">Related calculators</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/calculators/scope-1-combustion-calculator/"><span>Scope 1 Combustion</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/calculators/ghg-inventory-aggregator-scope123-calculator/"><span>GHG Inventory Aggregator</span><span class="arr">↗</span></a>
+    </div>
+  </section>
 
   <footer class="gc-footer">
     <span>Live version: <a href="https://greencalculus.com/calculators/scope-2-electricity-calculator/">Open the full calculator on GreenCalculus.com ↗</a></span>
