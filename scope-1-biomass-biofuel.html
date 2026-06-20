@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scope 1 Biomass & Biofuel Calculator — GreenCalculus</title>
+<meta name="description" content="Calculate Scope 1 biomass & biofuel emissions with the biogenic/fossil split. Fossil CO2e counted in Scope 1; biogenic CO2 reported as a memo. GHG Protocol aligned. Free tool by GreenCalculus.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --c-trust: #1D3215;
+    --c-action: #04BF62;
+    --c-action-dark: #03a554;
+    --c-bg: #0f1a0d;
+    --c-surface: #1a2e17;
+    --c-surface-2: #213820;
+    --c-border: rgba(4,191,98,0.15);
+    --c-text: #e8f5e2;
+    --c-muted: #7a9b72;
+    --c-mono: #a8d4a0;
+    --radius: 10px;
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--c-bg);
+    color: var(--c-text);
+    min-height: 100vh;
+    padding: clamp(1rem, 4vw, 2rem);
+  }
+
+  .gc-wrap {
+    max-width: 900px;
+    margin-inline: auto;
+  }
+
+  /* Breadcrumb nav */
+  .gc-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    font-family: var(--font-mono);
+    color: var(--c-muted);
+    margin-block-end: 1.5rem;
+  }
+  .gc-nav a { color: var(--c-action); text-decoration: none; }
+  .gc-nav a:hover { text-decoration: underline; }
+  .gc-nav span { color: var(--c-muted); }
+
+  /* Header */
+  .gc-header {
+    margin-block-end: 2rem;
+    padding-block-end: 1.5rem;
+    border-bottom: 1px solid var(--c-border);
+  }
+
+  .gc-wordmark {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--c-action);
+    margin-block-end: 0.5rem;
+  }
+
+  .gc-wordmark a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .gc-header h1 {
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    font-weight: 600;
+    line-height: 1.2;
+    margin-block-end: 0.5rem;
+  }
+
+  .gc-header p {
+    font-size: 0.9rem;
+    color: var(--c-muted);
+    line-height: 1.6;
+  }
+
+  .gc-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block-start: 0.75rem;
+  }
+
+  .gc-badge {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    background: var(--c-surface-2);
+    border: 1px solid var(--c-border);
+    color: var(--c-mono);
+  }
+
+  /* Calculator grid */
+  .gc-calc {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  @media (max-width: 600px) {
+    .gc-calc { grid-template-columns: 1fr; }
+  }
+
+  .gc-panel {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+  }
+
+  .gc-panel h2 {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+    margin-block-end: 1.25rem;
+  }
+
+  /* Form elements */
+  .gc-field {
+    margin-block-end: 1.25rem;
+  }
+
+  .gc-field label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--c-muted);
+    margin-block-end: 0.4rem;
+  }
+
+  .gc-field select,
+  .gc-field input {
+    width: 100%;
+    padding: 0.6rem 0.85rem;
+    background: var(--c-surface-2);
+    border: 1px solid var(--c-border);
+    border-radius: 6px;
+    color: var(--c-text);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    appearance: none;
+    transition: border-color 0.15s;
+  }
+
+  .gc-field select:focus,
+  .gc-field input:focus {
+    outline: none;
+    border-color: var(--c-action);
+  }
+
+  .gc-field .gc-unit {
+    font-size: 0.75rem;
+    color: var(--c-muted);
+    margin-block-start: 0.3rem;
+    font-family: var(--font-mono);
+  }
+
+  .gc-btn {
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--c-action);
+    color: #0f1a0d;
+    border: none;
+    border-radius: 6px;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-block-start: 0.5rem;
+  }
+
+  .gc-btn:hover { background: var(--c-action-dark); }
+
+  /* Results */
+  .gc-result-primary {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: var(--c-surface-2);
+    border-radius: var(--radius);
+    margin-block-end: 1.25rem;
+    border: 1px solid var(--c-border);
+  }
+
+  .gc-result-label {
+    font-size: 0.75rem;
+    color: var(--c-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-block-end: 0.5rem;
+  }
+
+  .gc-result-value {
+    font-family: var(--font-mono);
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 500;
+    color: var(--c-action);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  .gc-result-unit {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--c-muted);
+    margin-block-start: 0.4rem;
+  }
+
+  .gc-breakdown {
+    border-top: 1px solid var(--c-border);
+    padding-block-start: 1rem;
+  }
+
+  .gc-breakdown h3 {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+    margin-block-end: 0.75rem;
+  }
+
+  .gc-breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: 0.35rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 0.82rem;
+  }
+
+  .gc-breakdown-row:last-child { border-bottom: none; }
+
+  .gc-breakdown-key { color: var(--c-muted); }
+
+  .gc-breakdown-val {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--c-text);
+  }
+
+  /* Insight callout */
+  .gc-insight {
+    margin-block-start: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: var(--c-surface);
+    border-left: 3px solid var(--c-action);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 0.85rem;
+    color: var(--c-muted);
+    line-height: 1.6;
+  }
+
+  .gc-insight strong { color: var(--c-text); }
+
+  /* Footer */
+  .gc-footer {
+    margin-block-start: 2.5rem;
+    padding-block-start: 1.5rem;
+    border-top: 1px solid var(--c-border);
+    font-size: 0.78rem;
+    color: var(--c-muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    align-items: center;
+  }
+
+  .gc-footer a { color: var(--c-action); text-decoration: none; }
+  .gc-footer a:hover { text-decoration: underline; }
+
+  .gc-empty {
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    color: var(--c-muted);
+    text-align: center;
+    padding: 2rem 0;
+  }
+
+  /* Related references */
+  .gc-refs { margin-block-start: 2.5rem; }
+  .gc-refs h2 { font-size: 0.9rem; font-weight: 600; margin-block-end: 0.4rem; }
+  .gc-refs > p { font-size: 0.85rem; color: var(--c-muted); margin-block-end: 1.25rem; line-height: 1.6; }
+  .gc-refs-group { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-action); margin: 1.25rem 0 0.6rem; }
+  .gc-refs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.6rem; }
+  .gc-spoke { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; padding: 0.7rem 0.9rem; background: var(--c-surface); border: 1px solid var(--c-border); border-radius: 8px; text-decoration: none; color: var(--c-text); font-size: 0.83rem; transition: 0.15s; }
+  .gc-spoke:hover { border-color: rgba(4,191,98,0.4); transform: translateY(-1px); }
+  .gc-spoke .arr { color: var(--c-action); font-family: var(--font-mono); }
+</style>
+</head>
+<body>
+<div class="gc-wrap">
+
+  <nav class="gc-nav">
+    <a href="./index.html">← All calculators</a>
+    <span>/</span>
+    <span>Scope 1 Biomass &amp; Biofuel</span>
+  </nav>
+
+  <header class="gc-header">
+    <div class="gc-wordmark"><a href="https://greencalculus.com">GreenCalculus</a></div>
+    <h1>Scope 1 Biomass &amp; Biofuel Calculator</h1>
+    <p>Split biomass and biofuel combustion into fossil CO₂e (counted in Scope 1) and biogenic CO₂ (reported separately as a memo item), per the GHG Protocol.</p>
+    <div class="gc-badges">
+      <span class="gc-badge">GHG Protocol Scope 1</span>
+      <span class="gc-badge">Biogenic + Fossil split</span>
+      <span class="gc-badge">DEFRA 2026</span>
+      <span class="gc-badge">Zero dependencies</span>
+    </div>
+  </header>
+
+  <div class="gc-calc">
+
+    <div class="gc-panel">
+      <h2>Inputs</h2>
+
+      <div class="gc-field">
+        <label for="fuel">Biomass / biofuel</label>
+        <select id="fuel" onchange="updateUnits()">
+          <option value="wood_pellets">Wood pellets</option>
+          <option value="wood_chips">Wood chips</option>
+          <option value="wood_logs">Wood logs</option>
+          <option value="grass_straw">Grass / straw</option>
+          <option value="biodiesel">Biodiesel (ME)</option>
+          <option value="bioethanol">Bioethanol</option>
+          <option value="biogas">Biogas</option>
+          <option value="biomethane">Biomethane (compressed)</option>
+        </select>
+      </div>
+      <div class="gc-field">
+        <label for="quantity">Quantity consumed</label>
+        <input type="number" id="quantity" min="0" step="any" placeholder="0.00">
+        <div class="gc-unit" id="unit-label">Unit: tonnes</div>
+      </div>
+      <div class="gc-field">
+        <label for="period">Reporting period</label>
+        <select id="period"><option value="1">Annual</option><option value="0.25">Quarterly</option><option value="0.0833">Monthly</option></select>
+      </div>
+
+      <button class="gc-btn" onclick="calculate()">Calculate Emissions</button>
+    </div>
+
+    <div class="gc-panel">
+      <h2>Results</h2>
+      <div class="gc-result-primary">
+        <div class="gc-result-label">Scope 1 (fossil CO₂e)</div>
+        <div class="gc-result-value" id="result-value"><span class="gc-empty">—</span></div>
+        <div class="gc-result-unit" id="result-unit"></div>
+      </div>
+      <div class="gc-result-primary">
+        <div class="gc-result-label">Biogenic CO₂ — memo, reported separately</div>
+        <div class="gc-result-value" id="bio-value"><span class="gc-empty">—</span></div>
+        <div class="gc-result-unit" id="bio-unit"></div>
+      </div>
+      <div class="gc-breakdown" id="breakdown" style="display:none">
+        <h3>Calculation breakdown</h3>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Fuel</span><span class="gc-breakdown-val" id="bd-fuel">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Quantity</span><span class="gc-breakdown-val" id="bd-qty">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Fossil factor (in-scope)</span><span class="gc-breakdown-val" id="bd-ff">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Biogenic factor (memo)</span><span class="gc-breakdown-val" id="bd-bf">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Scope 1 fossil (kg CO₂e)</span><span class="gc-breakdown-val" id="bd-fkg">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Biogenic CO₂ (kg)</span><span class="gc-breakdown-val" id="bd-bkg">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">GWP basis</span><span class="gc-breakdown-val">IPCC AR5 GWP-100</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Source</span><span class="gc-breakdown-val">DEFRA 2026 Bioenergy</span></div>
+      </div>
+      <p style="font-size:0.72rem;color:var(--c-muted);margin-block-start:0.75rem;line-height:1.5">Demo factors: DEFRA 2026 Bioenergy &amp; outside-scopes tabs (wood-pellet values exact; other biogenic factors illustrative — the live calculator resolves the full set).</p>
+
+    </div>
+  </div>
+
+  <div class="gc-insight" id="insight" style="display:none">
+    <strong>Why this matters:</strong>
+    Under the <strong>GHG Protocol</strong>, only the fossil-derived CH₄ and N₂O from biomass/biofuel combustion is counted in <strong>Scope 1</strong>. The <strong>biogenic CO₂</strong> released is reported as a separate memo item (outside the scopes), never added to the Scope 1 total — for wood fuels it is typically <strong>20–40× larger</strong> than the in-scope figure. Switching a fossil boiler to biomass slashes the reported Scope 1 number, but the biogenic line keeps the carbon visible and auditable.
+  </div>
+
+  <section class="gc-refs">
+    <h2>Related on GreenCalculus.com</h2>
+    <p>The methodology, standards, definitions and related tools behind this calculator — all live on the platform.</p>
+    <div class="gc-refs-group">Methodology</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/methodology/biomass-biofuel-combustion-methodology/"><span>Biomass &amp; Biofuel Combustion</span><span class="arr">↗</span></a>
+    </div>
+    <div class="gc-refs-group">Standards &amp; data</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/standards/ghg-protocol-corporate-standard/"><span>GHG Protocol Corporate Standard</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/standards/uk-defra-emission-factors/"><span>UK DEFRA Emission Factors</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/standards/ipcc-2006-guidelines-national-inventories/"><span>IPCC 2006 Guidelines</span><span class="arr">↗</span></a>
+    </div>
+    <div class="gc-refs-group">Related calculators</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/calculators/scope-1-combustion-calculator/"><span>Scope 1 Stationary Combustion</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/calculators/scope-3-cat-3-well-to-tank-calculator/"><span>Scope 3 Cat 3a Well-to-Tank</span><span class="arr">↗</span></a>
+    </div>
+  </section>
+
+  <footer class="gc-footer">
+    <span>Live version: <a href="https://greencalculus.com/calculators/scope-1-biomass-biofuel-calculator/">Open the full calculator on GreenCalculus.com ↗</a></span>
+    <span>Methodology: <a href="https://github.com/greencalculus/greencalculus-methodology">greencalculus-methodology</a></span>
+    <span>Standard: GHG Protocol Corporate Standard — Scope 1</span>
+    <span>Factors: UK DEFRA 2026 (Bioenergy)</span>
+  </footer>
+
+</div>
+
+<script>
+
+  const FUELS = {
+    wood_pellets: { name:'Wood pellets',          unit:'tonnes', fossil:57.25249, bio:1677.18 },
+    wood_chips:   { name:'Wood chips',            unit:'tonnes', fossil:43.43964, bio:1574.00 },
+    wood_logs:    { name:'Wood logs',             unit:'tonnes', fossil:46.98508, bio:1612.00 },
+    grass_straw:  { name:'Grass / straw',         unit:'tonnes', fossil:47.35709, bio:1390.00 },
+    biodiesel:    { name:'Biodiesel (ME)',        unit:'litres', fossil:0.16751,  bio:2.51000 },
+    bioethanol:   { name:'Bioethanol',            unit:'litres', fossil:0.00901,  bio:1.51000 },
+    biogas:       { name:'Biogas',                unit:'kWh',    fossil:0.00022,  bio:0.18683 },
+    biomethane:   { name:'Biomethane (compressed)', unit:'kg',   fossil:0.00521,  bio:2.70000 },
+  };
+  function updateUnits(){ document.getElementById('unit-label').textContent = 'Unit: ' + FUELS[document.getElementById('fuel').value].unit; }
+  function t(x){ return x>=1 ? x.toFixed(2) : x.toFixed(4); }
+  function calculate(){
+    const f = FUELS[document.getElementById('fuel').value];
+    const qty = parseFloat(document.getElementById('quantity').value);
+    const period = parseFloat(document.getElementById('period').value);
+    if(!qty || qty<=0){ document.getElementById('result-value').innerHTML='<span class="gc-empty">Enter a quantity</span>'; document.getElementById('result-unit').textContent=''; document.getElementById('bio-value').innerHTML='<span class="gc-empty">—</span>'; document.getElementById('bio-unit').textContent=''; document.getElementById('breakdown').style.display='none'; document.getElementById('insight').style.display='none'; return; }
+    const fkg = qty*f.fossil, bkg = qty*f.bio;
+    const fT = (fkg/period)/1000, bT = (bkg/period)/1000;
+    document.getElementById('result-value').textContent = t(fT);
+    document.getElementById('result-unit').textContent  = 'tCO₂e' + (period<1?' (annualised)':'');
+    document.getElementById('bio-value').textContent = t(bT);
+    document.getElementById('bio-unit').textContent  = 'tCO₂ biogenic (not in Scope 1)';
+    document.getElementById('bd-fuel').textContent = f.name;
+    document.getElementById('bd-qty').textContent  = qty.toLocaleString()+' '+f.unit;
+    document.getElementById('bd-ff').textContent   = f.fossil+' kg CO₂e / '+f.unit;
+    document.getElementById('bd-bf').textContent   = f.bio+' kg CO₂ / '+f.unit;
+    document.getElementById('bd-fkg').textContent  = fkg.toFixed(2)+' kg';
+    document.getElementById('bd-bkg').textContent  = bkg.toFixed(2)+' kg';
+    document.getElementById('breakdown').style.display='block';
+    document.getElementById('insight').style.display='block';
+  }
+  document.getElementById('quantity').addEventListener('keydown', e=>{ if(e.key==='Enter') calculate(); });
+
+</script>
+</body>
+</html>
