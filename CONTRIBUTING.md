@@ -29,4 +29,4 @@ welcome fixes, improvements, and new calculator demos from the community.
 - Emission factors must cite a published, authoritative source (GHG Protocol, IPCC, DEFRA, etc.).
 - Be respectful and constructive.
 
-Questions? Open an issue or reach us at hello@greencalculus.com.
+Questions? Open an issue or reach us at jeremiah@greencalculus.com.
