@@ -184,6 +184,75 @@
   }
   .gc-card-live:hover { text-decoration: underline; }
 
+  /* More live calculators (link-out) */
+  .gc-more {
+    margin-block-start: 3.5rem;
+    padding-block-start: 2.5rem;
+    border-top: 1px solid var(--c-border);
+  }
+  .gc-more > h2 {
+    font-size: clamp(1.3rem, 3vw, 1.6rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-block-end: 0.5rem;
+  }
+  .gc-more-intro {
+    font-size: 0.92rem;
+    color: var(--c-muted);
+    max-width: 64ch;
+    margin-block-end: 2rem;
+  }
+  .gc-more-intro a { color: var(--c-action); text-decoration: none; }
+  .gc-more-intro a:hover { text-decoration: underline; }
+
+  .gc-scope-group { margin-block-end: 2rem; }
+  .gc-scope-label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-action);
+    margin-block-end: 1rem;
+    padding-block-end: 0.55rem;
+    border-bottom: 1px solid var(--c-border);
+  }
+  .gc-scope-label a { color: var(--c-muted); text-decoration: none; text-transform: none; letter-spacing: 0; }
+  .gc-scope-label a:hover { color: var(--c-action); text-decoration: underline; }
+
+  .gc-link-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(258px, 1fr));
+    gap: 0.85rem;
+  }
+  .gc-link-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.2rem;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.18s, transform 0.18s;
+  }
+  .gc-link-card:hover { border-color: rgba(4,191,98,0.4); transform: translateY(-2px); }
+  .gc-link-card h3 {
+    font-size: 0.97rem;
+    font-weight: 600;
+    line-height: 1.25;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .gc-link-arrow { color: var(--c-action); font-size: 0.85rem; flex-shrink: 0; }
+  .gc-link-card p { font-size: 0.8rem; color: var(--c-muted); line-height: 1.55; }
+
   /* Footer */
   .gc-footer {
     margin-block-start: 3rem;
@@ -395,6 +464,62 @@
     </article>
 
   </main>
+
+  <section class="gc-more">
+    <h2>More live calculators</h2>
+    <p class="gc-more-intro">
+      Seven more Scope 1 &amp; Scope 2 calculators shipped on
+      <a href="https://greencalculus.com/calculators/">GreenCalculus.com</a> in June 2026 —
+      each GHG Protocol aligned, IPCC AR6 based, and fully sourced. Self-contained demos for
+      these are on the way; for now, run them live:
+    </p>
+
+    <div class="gc-scope-group">
+      <div class="gc-scope-label">
+        <span>Scope 1 · Direct emissions</span>
+        <a href="https://greencalculus.com/calculators/">All calculators ↗</a>
+      </div>
+      <div class="gc-link-grid">
+        <a class="gc-link-card" href="https://greencalculus.com/calculators/scope-1-biomass-biofuel-calculator/">
+          <h3><span>Biomass &amp; Biofuel</span><span class="gc-link-arrow">↗</span></h3>
+          <p>Split biomass &amp; biofuel combustion into fossil CO₂e (counted in Scope 1) and biogenic CO₂ (reported as a memo item), per the GHG Protocol.</p>
+        </a>
+        <a class="gc-link-card" href="https://greencalculus.com/calculators/scope-1-marine-aviation-fuel-own-operations-calculator/">
+          <h3><span>Marine &amp; Aviation Fuel</span><span class="gc-link-arrow">↗</span></h3>
+          <p>Scope 1 emissions from owned or controlled ships and aircraft across marine and aviation fuel types — your own operations, not business travel.</p>
+        </a>
+        <a class="gc-link-card" href="https://greencalculus.com/calculators/scope-1-chp-cogeneration-calculator/">
+          <h3><span>CHP / Cogeneration</span><span class="gc-link-arrow">↗</span></h3>
+          <p>Allocate combined heat &amp; power fuel emissions across electricity and useful heat using the GHG Protocol efficiency method (spans Scope 1 + 2).</p>
+        </a>
+      </div>
+    </div>
+
+    <div class="gc-scope-group">
+      <div class="gc-scope-label">
+        <span>Scope 2 · Purchased energy</span>
+        <a href="https://greencalculus.com/calculators/">All calculators ↗</a>
+      </div>
+      <div class="gc-link-grid">
+        <a class="gc-link-card" href="https://greencalculus.com/calculators/scope-2-purchased-steam-hot-water-calculator/">
+          <h3><span>Purchased Steam &amp; Hot Water</span><span class="gc-link-arrow">↗</span></h3>
+          <p>Convert purchased steam and hot water into tCO₂e via enthalpy and supplier-fuel back-calculation, on both a location- and market-based basis.</p>
+        </a>
+        <a class="gc-link-card" href="https://greencalculus.com/calculators/scope-2-residual-mix-calculator/">
+          <h3><span>Residual Mix</span><span class="gc-link-arrow">↗</span></h3>
+          <p>Apply the correct AIB / Green-e residual-mix factor to untracked electricity — the market-based default once contractual instruments are removed.</p>
+        </a>
+        <a class="gc-link-card" href="https://greencalculus.com/calculators/scope-2-renewable-procurement-rec-ppa-calculator/">
+          <h3><span>Renewable Procurement</span><span class="gc-link-arrow">↗</span></h3>
+          <p>Model how RECs, PPAs, VPPAs and onsite generation cut market-based Scope 2 emissions, with the residual mix applied to the remaining load.</p>
+        </a>
+        <a class="gc-link-card" href="https://greencalculus.com/calculators/scope-2-district-heating-cooling-calculator/">
+          <h3><span>District Heating &amp; Cooling</span><span class="gc-link-arrow">↗</span></h3>
+          <p>Convert purchased district heat and cooling into tCO₂e on a location- and market-based basis, using network or supplier-specific factors.</p>
+        </a>
+      </div>
+    </div>
+  </section>
 
   <footer class="gc-footer">
     <span>Full platform: <a href="https://greencalculus.com">GreenCalculus.com</a></span>
