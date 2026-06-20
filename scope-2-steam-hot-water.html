@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scope 2 Purchased Steam & Hot Water Calculator — GreenCalculus</title>
+<meta name="description" content="Calculate Scope 2 emissions from purchased steam and hot water — location- and market-based. DEFRA 2026 / EPA method. Free tool by GreenCalculus.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --c-trust: #1D3215;
+    --c-action: #04BF62;
+    --c-action-dark: #03a554;
+    --c-bg: #0f1a0d;
+    --c-surface: #1a2e17;
+    --c-surface-2: #213820;
+    --c-border: rgba(4,191,98,0.15);
+    --c-text: #e8f5e2;
+    --c-muted: #7a9b72;
+    --c-mono: #a8d4a0;
+    --radius: 10px;
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--c-bg);
+    color: var(--c-text);
+    min-height: 100vh;
+    padding: clamp(1rem, 4vw, 2rem);
+  }
+
+  .gc-wrap {
+    max-width: 900px;
+    margin-inline: auto;
+  }
+
+  /* Breadcrumb nav */
+  .gc-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    font-family: var(--font-mono);
+    color: var(--c-muted);
+    margin-block-end: 1.5rem;
+  }
+  .gc-nav a { color: var(--c-action); text-decoration: none; }
+  .gc-nav a:hover { text-decoration: underline; }
+  .gc-nav span { color: var(--c-muted); }
+
+  /* Header */
+  .gc-header {
+    margin-block-end: 2rem;
+    padding-block-end: 1.5rem;
+    border-bottom: 1px solid var(--c-border);
+  }
+
+  .gc-wordmark {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--c-action);
+    margin-block-end: 0.5rem;
+  }
+
+  .gc-wordmark a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .gc-header h1 {
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    font-weight: 600;
+    line-height: 1.2;
+    margin-block-end: 0.5rem;
+  }
+
+  .gc-header p {
+    font-size: 0.9rem;
+    color: var(--c-muted);
+    line-height: 1.6;
+  }
+
+  .gc-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block-start: 0.75rem;
+  }
+
+  .gc-badge {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    background: var(--c-surface-2);
+    border: 1px solid var(--c-border);
+    color: var(--c-mono);
+  }
+
+  /* Calculator grid */
+  .gc-calc {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  @media (max-width: 600px) {
+    .gc-calc { grid-template-columns: 1fr; }
+  }
+
+  .gc-panel {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+  }
+
+  .gc-panel h2 {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+    margin-block-end: 1.25rem;
+  }
+
+  /* Form elements */
+  .gc-field {
+    margin-block-end: 1.25rem;
+  }
+
+  .gc-field label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--c-muted);
+    margin-block-end: 0.4rem;
+  }
+
+  .gc-field select,
+  .gc-field input {
+    width: 100%;
+    padding: 0.6rem 0.85rem;
+    background: var(--c-surface-2);
+    border: 1px solid var(--c-border);
+    border-radius: 6px;
+    color: var(--c-text);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    appearance: none;
+    transition: border-color 0.15s;
+  }
+
+  .gc-field select:focus,
+  .gc-field input:focus {
+    outline: none;
+    border-color: var(--c-action);
+  }
+
+  .gc-field .gc-unit {
+    font-size: 0.75rem;
+    color: var(--c-muted);
+    margin-block-start: 0.3rem;
+    font-family: var(--font-mono);
+  }
+
+  .gc-btn {
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--c-action);
+    color: #0f1a0d;
+    border: none;
+    border-radius: 6px;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-block-start: 0.5rem;
+  }
+
+  .gc-btn:hover { background: var(--c-action-dark); }
+
+  /* Results */
+  .gc-result-primary {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: var(--c-surface-2);
+    border-radius: var(--radius);
+    margin-block-end: 1.25rem;
+    border: 1px solid var(--c-border);
+  }
+
+  .gc-result-label {
+    font-size: 0.75rem;
+    color: var(--c-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-block-end: 0.5rem;
+  }
+
+  .gc-result-value {
+    font-family: var(--font-mono);
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 500;
+    color: var(--c-action);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  .gc-result-unit {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--c-muted);
+    margin-block-start: 0.4rem;
+  }
+
+  .gc-breakdown {
+    border-top: 1px solid var(--c-border);
+    padding-block-start: 1rem;
+  }
+
+  .gc-breakdown h3 {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+    margin-block-end: 0.75rem;
+  }
+
+  .gc-breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: 0.35rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 0.82rem;
+  }
+
+  .gc-breakdown-row:last-child { border-bottom: none; }
+
+  .gc-breakdown-key { color: var(--c-muted); }
+
+  .gc-breakdown-val {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--c-text);
+  }
+
+  /* Insight callout */
+  .gc-insight {
+    margin-block-start: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: var(--c-surface);
+    border-left: 3px solid var(--c-action);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 0.85rem;
+    color: var(--c-muted);
+    line-height: 1.6;
+  }
+
+  .gc-insight strong { color: var(--c-text); }
+
+  /* Footer */
+  .gc-footer {
+    margin-block-start: 2.5rem;
+    padding-block-start: 1.5rem;
+    border-top: 1px solid var(--c-border);
+    font-size: 0.78rem;
+    color: var(--c-muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    align-items: center;
+  }
+
+  .gc-footer a { color: var(--c-action); text-decoration: none; }
+  .gc-footer a:hover { text-decoration: underline; }
+
+  .gc-empty {
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    color: var(--c-muted);
+    text-align: center;
+    padding: 2rem 0;
+  }
+
+  /* Related references */
+  .gc-refs { margin-block-start: 2.5rem; }
+  .gc-refs h2 { font-size: 0.9rem; font-weight: 600; margin-block-end: 0.4rem; }
+  .gc-refs > p { font-size: 0.85rem; color: var(--c-muted); margin-block-end: 1.25rem; line-height: 1.6; }
+  .gc-refs-group { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-action); margin: 1.25rem 0 0.6rem; }
+  .gc-refs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.6rem; }
+  .gc-spoke { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; padding: 0.7rem 0.9rem; background: var(--c-surface); border: 1px solid var(--c-border); border-radius: 8px; text-decoration: none; color: var(--c-text); font-size: 0.83rem; transition: 0.15s; }
+  .gc-spoke:hover { border-color: rgba(4,191,98,0.4); transform: translateY(-1px); }
+  .gc-spoke .arr { color: var(--c-action); font-family: var(--font-mono); }
+</style>
+</head>
+<body>
+<div class="gc-wrap">
+
+  <nav class="gc-nav">
+    <a href="./index.html">← All calculators</a>
+    <span>/</span>
+    <span>Scope 2 Purchased Steam &amp; Hot Water</span>
+  </nav>
+
+  <header class="gc-header">
+    <div class="gc-wordmark"><a href="https://greencalculus.com">GreenCalculus</a></div>
+    <h1>Scope 2 Purchased Steam &amp; Hot Water Calculator</h1>
+    <p>Convert purchased steam and hot water into tCO₂e on both a location-based and a supplier-specific market-based basis, per the GHG Protocol Scope 2 Guidance.</p>
+    <div class="gc-badges">
+      <span class="gc-badge">GHG Protocol Scope 2</span>
+      <span class="gc-badge">Location + market</span>
+      <span class="gc-badge">DEFRA 2026</span>
+      <span class="gc-badge">Zero dependencies</span>
+    </div>
+  </header>
+
+  <div class="gc-calc">
+
+    <div class="gc-panel">
+      <h2>Inputs</h2>
+
+      <div class="gc-field"><label for="energy">Energy purchased (kWh)</label><input type="number" id="energy" min="0" step="any" placeholder="2000000"></div>
+      <div class="gc-field"><label for="locf">Location-based factor (kg CO₂e/kWh)</label><input type="number" id="locf" min="0" step="any" value="0.17529"><div class="gc-unit">Default: UK district heat, DEFRA 2026</div></div>
+      <div class="gc-field"><label for="mktf">Market-based / supplier factor (kg CO₂e/kWh)</label><input type="number" id="mktf" min="0" step="any" placeholder="optional — e.g. 0.22789"><div class="gc-unit">Supplier EF = fuel EF ÷ generation efficiency. Blank → uses location factor.</div></div>
+      <div class="gc-field"><label for="period">Reporting period</label><select id="period"><option value="1">Annual</option><option value="0.25">Quarterly</option><option value="0.0833">Monthly</option></select></div>
+
+      <button class="gc-btn" onclick="calculate()">Calculate Emissions</button>
+    </div>
+
+    <div class="gc-panel">
+      <h2>Results</h2>
+      <div class="gc-result-primary">
+        <div class="gc-result-label">Location-based Scope 2</div>
+        <div class="gc-result-value" id="result-value"><span class="gc-empty">—</span></div>
+        <div class="gc-result-unit" id="result-unit"></div>
+      </div>
+      <div class="gc-result-primary">
+        <div class="gc-result-label">Market-based Scope 2</div>
+        <div class="gc-result-value" id="mkt-value"><span class="gc-empty">—</span></div>
+        <div class="gc-result-unit" id="mkt-unit"></div>
+      </div>
+      <div class="gc-breakdown" id="breakdown" style="display:none">
+        <h3>Calculation breakdown</h3>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Energy purchased</span><span class="gc-breakdown-val" id="bd-energy">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Location factor</span><span class="gc-breakdown-val" id="bd-locf">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Market factor</span><span class="gc-breakdown-val" id="bd-mktf">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Location-based (kg CO₂e)</span><span class="gc-breakdown-val" id="bd-lockg">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Market-based (kg CO₂e)</span><span class="gc-breakdown-val" id="bd-mktkg">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">GWP basis</span><span class="gc-breakdown-val">IPCC AR5 GWP-100</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Source</span><span class="gc-breakdown-val">DEFRA 2026 / EPA method</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="gc-insight" id="insight" style="display:none">
+    <strong>Why this matters:</strong>
+    Purchased steam and hot water are <strong>purchased energy → Scope 2</strong>, not Scope 1. The GHG Protocol Scope 2 Guidance requires <strong>dual reporting</strong>: a <strong>location-based</strong> figure on an average network factor, and a <strong>market-based</strong> figure on your supplier-specific contract. The supplier factor is back-calculated as <em>fuel EF ÷ generation efficiency</em> — a gas boiler at 80% efficiency delivers heat at ~0.228 kg CO₂e/kWh. For networked district energy, use the District Heating &amp; Cooling calculator.
+  </div>
+
+  <section class="gc-refs">
+    <h2>Related on GreenCalculus.com</h2>
+    <p>The methodology, standards, definitions and related tools behind this calculator — all live on the platform.</p>
+    <div class="gc-refs-group">Methodology</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/methodology/purchased-steam-heat-methodology/"><span>Purchased Steam &amp; Heat</span><span class="arr">↗</span></a>
+    </div>
+    <div class="gc-refs-group">Standards &amp; data</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/standards/ghg-protocol-scope-2-guidance/"><span>GHG Protocol Scope 2 Guidance</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/standards/uk-defra-emission-factors/"><span>UK DEFRA Emission Factors</span><span class="arr">↗</span></a>
+    </div>
+    <div class="gc-refs-group">Related calculators</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/calculators/scope-2-district-heating-cooling-calculator/"><span>Scope 2 District Heating &amp; Cooling</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/calculators/scope-1-chp-cogeneration-calculator/"><span>Scope 1 + 2 CHP / Cogeneration</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/calculators/scope-2-electricity-calculator/"><span>Scope 2 Electricity</span><span class="arr">↗</span></a>
+    </div>
+  </section>
+
+  <footer class="gc-footer">
+    <span>Live version: <a href="https://greencalculus.com/calculators/scope-2-purchased-steam-hot-water-calculator/">Open the full calculator on GreenCalculus.com ↗</a></span>
+    <span>Methodology: <a href="https://github.com/greencalculus/greencalculus-methodology">greencalculus-methodology</a></span>
+    <span>Standard: GHG Protocol Scope 2 Guidance — dual reporting</span>
+    <span>Factors: UK DEFRA 2026 · EPA method</span>
+  </footer>
+
+</div>
+
+<script>
+
+  function t2(x){ return x>=1 ? x.toFixed(2) : x.toFixed(4); }
+  function calculate(){
+    const e = parseFloat(document.getElementById('energy').value);
+    const lf = parseFloat(document.getElementById('locf').value);
+    let mf = parseFloat(document.getElementById('mktf').value);
+    const period = parseFloat(document.getElementById('period').value);
+    if(!e||e<=0||!lf||lf<0){ document.getElementById('result-value').innerHTML='<span class="gc-empty">Enter energy + factor</span>'; document.getElementById('result-unit').textContent=''; document.getElementById('mkt-value').innerHTML='<span class="gc-empty">—</span>'; document.getElementById('mkt-unit').textContent=''; document.getElementById('breakdown').style.display='none'; document.getElementById('insight').style.display='none'; return; }
+    if(isNaN(mf)) mf = lf;
+    const lockg = e*lf, mktkg = e*mf;
+    const locT = (lockg/period)/1000, mktT = (mktkg/period)/1000;
+    document.getElementById('result-value').textContent = t2(locT);
+    document.getElementById('result-unit').textContent  = 'tCO₂e (location-based)'+(period<1?' (annualised)':'');
+    document.getElementById('mkt-value').textContent = t2(mktT);
+    document.getElementById('mkt-unit').textContent  = 'tCO₂e (market-based)';
+    document.getElementById('bd-energy').textContent = e.toLocaleString()+' kWh';
+    document.getElementById('bd-locf').textContent = lf+' kg CO₂e/kWh';
+    document.getElementById('bd-mktf').textContent = mf+' kg CO₂e/kWh';
+    document.getElementById('bd-lockg').textContent = lockg.toFixed(2)+' kg';
+    document.getElementById('bd-mktkg').textContent = mktkg.toFixed(2)+' kg';
+    document.getElementById('breakdown').style.display='block';
+    document.getElementById('insight').style.display='block';
+  }
+  ['energy','locf','mktf'].forEach(id=>document.getElementById(id).addEventListener('keydown', e=>{ if(e.key==='Enter') calculate(); }));
+
+</script>
+</body>
+</html>
