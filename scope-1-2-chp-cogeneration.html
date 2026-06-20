@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scope 1 + 2 CHP / Cogeneration Calculator — GreenCalculus</title>
+<meta name="description" content="Allocate combined heat & power emissions across electricity and heat with the GHG Protocol efficiency method. Scope 1 + 2. Free tool by GreenCalculus.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --c-trust: #1D3215;
+    --c-action: #04BF62;
+    --c-action-dark: #03a554;
+    --c-bg: #0f1a0d;
+    --c-surface: #1a2e17;
+    --c-surface-2: #213820;
+    --c-border: rgba(4,191,98,0.15);
+    --c-text: #e8f5e2;
+    --c-muted: #7a9b72;
+    --c-mono: #a8d4a0;
+    --radius: 10px;
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--c-bg);
+    color: var(--c-text);
+    min-height: 100vh;
+    padding: clamp(1rem, 4vw, 2rem);
+  }
+
+  .gc-wrap {
+    max-width: 900px;
+    margin-inline: auto;
+  }
+
+  /* Breadcrumb nav */
+  .gc-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    font-family: var(--font-mono);
+    color: var(--c-muted);
+    margin-block-end: 1.5rem;
+  }
+  .gc-nav a { color: var(--c-action); text-decoration: none; }
+  .gc-nav a:hover { text-decoration: underline; }
+  .gc-nav span { color: var(--c-muted); }
+
+  /* Header */
+  .gc-header {
+    margin-block-end: 2rem;
+    padding-block-end: 1.5rem;
+    border-bottom: 1px solid var(--c-border);
+  }
+
+  .gc-wordmark {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--c-action);
+    margin-block-end: 0.5rem;
+  }
+
+  .gc-wordmark a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .gc-header h1 {
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    font-weight: 600;
+    line-height: 1.2;
+    margin-block-end: 0.5rem;
+  }
+
+  .gc-header p {
+    font-size: 0.9rem;
+    color: var(--c-muted);
+    line-height: 1.6;
+  }
+
+  .gc-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block-start: 0.75rem;
+  }
+
+  .gc-badge {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    background: var(--c-surface-2);
+    border: 1px solid var(--c-border);
+    color: var(--c-mono);
+  }
+
+  /* Calculator grid */
+  .gc-calc {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  @media (max-width: 600px) {
+    .gc-calc { grid-template-columns: 1fr; }
+  }
+
+  .gc-panel {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+  }
+
+  .gc-panel h2 {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+    margin-block-end: 1.25rem;
+  }
+
+  /* Form elements */
+  .gc-field {
+    margin-block-end: 1.25rem;
+  }
+
+  .gc-field label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--c-muted);
+    margin-block-end: 0.4rem;
+  }
+
+  .gc-field select,
+  .gc-field input {
+    width: 100%;
+    padding: 0.6rem 0.85rem;
+    background: var(--c-surface-2);
+    border: 1px solid var(--c-border);
+    border-radius: 6px;
+    color: var(--c-text);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    appearance: none;
+    transition: border-color 0.15s;
+  }
+
+  .gc-field select:focus,
+  .gc-field input:focus {
+    outline: none;
+    border-color: var(--c-action);
+  }
+
+  .gc-field .gc-unit {
+    font-size: 0.75rem;
+    color: var(--c-muted);
+    margin-block-start: 0.3rem;
+    font-family: var(--font-mono);
+  }
+
+  .gc-btn {
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--c-action);
+    color: #0f1a0d;
+    border: none;
+    border-radius: 6px;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-block-start: 0.5rem;
+  }
+
+  .gc-btn:hover { background: var(--c-action-dark); }
+
+  /* Results */
+  .gc-result-primary {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: var(--c-surface-2);
+    border-radius: var(--radius);
+    margin-block-end: 1.25rem;
+    border: 1px solid var(--c-border);
+  }
+
+  .gc-result-label {
+    font-size: 0.75rem;
+    color: var(--c-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-block-end: 0.5rem;
+  }
+
+  .gc-result-value {
+    font-family: var(--font-mono);
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 500;
+    color: var(--c-action);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  .gc-result-unit {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--c-muted);
+    margin-block-start: 0.4rem;
+  }
+
+  .gc-breakdown {
+    border-top: 1px solid var(--c-border);
+    padding-block-start: 1rem;
+  }
+
+  .gc-breakdown h3 {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+    margin-block-end: 0.75rem;
+  }
+
+  .gc-breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: 0.35rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 0.82rem;
+  }
+
+  .gc-breakdown-row:last-child { border-bottom: none; }
+
+  .gc-breakdown-key { color: var(--c-muted); }
+
+  .gc-breakdown-val {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--c-text);
+  }
+
+  /* Insight callout */
+  .gc-insight {
+    margin-block-start: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: var(--c-surface);
+    border-left: 3px solid var(--c-action);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 0.85rem;
+    color: var(--c-muted);
+    line-height: 1.6;
+  }
+
+  .gc-insight strong { color: var(--c-text); }
+
+  /* Footer */
+  .gc-footer {
+    margin-block-start: 2.5rem;
+    padding-block-start: 1.5rem;
+    border-top: 1px solid var(--c-border);
+    font-size: 0.78rem;
+    color: var(--c-muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    align-items: center;
+  }
+
+  .gc-footer a { color: var(--c-action); text-decoration: none; }
+  .gc-footer a:hover { text-decoration: underline; }
+
+  .gc-empty {
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    color: var(--c-muted);
+    text-align: center;
+    padding: 2rem 0;
+  }
+
+  /* Related references */
+  .gc-refs { margin-block-start: 2.5rem; }
+  .gc-refs h2 { font-size: 0.9rem; font-weight: 600; margin-block-end: 0.4rem; }
+  .gc-refs > p { font-size: 0.85rem; color: var(--c-muted); margin-block-end: 1.25rem; line-height: 1.6; }
+  .gc-refs-group { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-action); margin: 1.25rem 0 0.6rem; }
+  .gc-refs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.6rem; }
+  .gc-spoke { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; padding: 0.7rem 0.9rem; background: var(--c-surface); border: 1px solid var(--c-border); border-radius: 8px; text-decoration: none; color: var(--c-text); font-size: 0.83rem; transition: 0.15s; }
+  .gc-spoke:hover { border-color: rgba(4,191,98,0.4); transform: translateY(-1px); }
+  .gc-spoke .arr { color: var(--c-action); font-family: var(--font-mono); }
+</style>
+</head>
+<body>
+<div class="gc-wrap">
+
+  <nav class="gc-nav">
+    <a href="./index.html">← All calculators</a>
+    <span>/</span>
+    <span>CHP / Cogeneration</span>
+  </nav>
+
+  <header class="gc-header">
+    <div class="gc-wordmark"><a href="https://greencalculus.com">GreenCalculus</a></div>
+    <h1>Scope 1 + 2 CHP / Cogeneration Calculator</h1>
+    <p>Allocate a combined-heat-and-power plant's fuel emissions across its electricity and heat outputs using the GHG Protocol efficiency method.</p>
+    <div class="gc-badges">
+      <span class="gc-badge">GHG Protocol Scope 1 + 2</span>
+      <span class="gc-badge">Efficiency method</span>
+      <span class="gc-badge">DEFRA 2026</span>
+      <span class="gc-badge">Zero dependencies</span>
+    </div>
+  </header>
+
+  <div class="gc-calc">
+
+    <div class="gc-panel">
+      <h2>Inputs</h2>
+
+      <div class="gc-field">
+        <label for="fuel">Fuel</label>
+        <select id="fuel"><option value="0.18293">Natural gas</option><option value="2.51060">Diesel / gas oil (per L*)</option><option value="0.21449">LPG</option></select>
+        <div class="gc-unit">Natural gas factor kg CO₂e / kWh (gross CV)</div>
+      </div>
+      <div class="gc-field"><label for="fuelin">Fuel input (kWh)</label><input type="number" id="fuelin" min="0" step="any" placeholder="10000"></div>
+      <div class="gc-field"><label for="power">Electricity generated (kWh)</label><input type="number" id="power" min="0" step="any" placeholder="3500"></div>
+      <div class="gc-field"><label for="heat">Useful heat recovered (kWh)</label><input type="number" id="heat" min="0" step="any" placeholder="4500"></div>
+      <div class="gc-field"><label for="ep">Reference electrical efficiency η<sub>e</sub></label><input type="number" id="ep" min="0.01" max="1" step="any" value="0.35"></div>
+      <div class="gc-field"><label for="eh">Reference thermal efficiency η<sub>h</sub></label><input type="number" id="eh" min="0.01" max="1" step="any" value="0.80"></div>
+
+      <button class="gc-btn" onclick="calculate()">Calculate Emissions</button>
+    </div>
+
+    <div class="gc-panel">
+      <h2>Results</h2>
+      <div class="gc-result-primary">
+        <div class="gc-result-label">Total Scope 1 emissions</div>
+        <div class="gc-result-value" id="result-value"><span class="gc-empty">—</span></div>
+        <div class="gc-result-unit" id="result-unit"></div>
+      </div>
+      <div class="gc-breakdown" id="breakdown" style="display:none">
+        <h3>Calculation breakdown</h3>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Total combustion (Scope 1)</span><span class="gc-breakdown-val" id="bd-total">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Allocated to electricity</span><span class="gc-breakdown-val" id="bd-power">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Allocated to heat</span><span class="gc-breakdown-val" id="bd-heat">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Electricity carbon intensity</span><span class="gc-breakdown-val" id="bd-efp">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Heat carbon intensity</span><span class="gc-breakdown-val" id="bd-efh">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Power allocation fraction</span><span class="gc-breakdown-val" id="bd-fp">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Heat allocation fraction</span><span class="gc-breakdown-val" id="bd-fh">—</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Method</span><span class="gc-breakdown-val">GHG Protocol efficiency method (2006)</span></div>
+        <div class="gc-breakdown-row"><span class="gc-breakdown-key">Source</span><span class="gc-breakdown-val">DEFRA 2026</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="gc-insight" id="insight" style="display:none">
+    <strong>Why this matters:</strong>
+    A CHP plant turns one fuel input into two useful outputs, so its emissions must be shared between them. The <strong>efficiency method</strong> allocates by what each output would have emitted if produced separately (reference efficiencies η<sub>e</sub>=0.35, η<sub>h</sub>=0.80). The operator reports the <strong>total as Scope 1</strong>; a third party that buys the exported electricity or heat reports its allocated share as <strong>Scope 2</strong> — which is why CHP spans both scopes.
+  </div>
+
+  <section class="gc-refs">
+    <h2>Related on GreenCalculus.com</h2>
+    <p>The methodology, standards, definitions and related tools behind this calculator — all live on the platform.</p>
+    <div class="gc-refs-group">Standards &amp; data</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/standards/ghg-protocol-corporate-standard/"><span>GHG Protocol Corporate Standard</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/standards/ghg-protocol-scope-2-guidance/"><span>GHG Protocol Scope 2 Guidance</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/standards/uk-defra-emission-factors/"><span>UK DEFRA Emission Factors</span><span class="arr">↗</span></a>
+    </div>
+    <div class="gc-refs-group">Related calculators</div>
+    <div class="gc-refs-grid">
+      <a class="gc-spoke" href="https://greencalculus.com/calculators/scope-1-combustion-calculator/"><span>Scope 1 Stationary Combustion</span><span class="arr">↗</span></a>
+      <a class="gc-spoke" href="https://greencalculus.com/calculators/scope-2-electricity-calculator/"><span>Scope 2 Electricity</span><span class="arr">↗</span></a>
+    </div>
+  </section>
+
+  <footer class="gc-footer">
+    <span>Live version: <a href="https://greencalculus.com/calculators/scope-1-chp-cogeneration-calculator/">Open the full calculator on GreenCalculus.com ↗</a></span>
+    <span>Methodology: <a href="https://github.com/greencalculus/greencalculus-methodology">greencalculus-methodology</a></span>
+    <span>Standard: GHG Protocol Corporate Standard — Scope 1 + 2</span>
+    <span>Factors: UK DEFRA 2026</span>
+  </footer>
+
+</div>
+
+<script>
+
+  function t2(x){ return x>=1 ? x.toFixed(2) : x.toFixed(4); }
+  function calculate(){
+    const ef = parseFloat(document.getElementById('fuel').value);
+    const fuelin = parseFloat(document.getElementById('fuelin').value);
+    const P = parseFloat(document.getElementById('power').value);
+    const H = parseFloat(document.getElementById('heat').value);
+    const ep = parseFloat(document.getElementById('ep').value);
+    const eh = parseFloat(document.getElementById('eh').value);
+    if(!fuelin||fuelin<=0||!P||P<=0||!H||H<=0||!ep||!eh){ document.getElementById('result-value').innerHTML='<span class="gc-empty">Fill all fields</span>'; document.getElementById('result-unit').textContent=''; document.getElementById('breakdown').style.display='none'; document.getElementById('insight').style.display='none'; return; }
+    const ET = fuelin*ef;                 // kg CO2e total
+    const dP = P/ep, dH = H/eh, den = dP+dH;
+    const fp = dP/den, fh = dH/den;
+    const EP = ET*fp, EH = ET*fh;
+    document.getElementById('result-value').textContent = t2(ET/1000);
+    document.getElementById('result-unit').textContent  = 'tCO₂e (total Scope 1)';
+    document.getElementById('bd-total').textContent = (ET/1000).toFixed(3)+' tCO₂e';
+    document.getElementById('bd-power').textContent = (EP/1000).toFixed(3)+' tCO₂e';
+    document.getElementById('bd-heat').textContent  = (EH/1000).toFixed(3)+' tCO₂e';
+    document.getElementById('bd-efp').textContent   = (EP/P).toFixed(4)+' kg CO₂e / kWh';
+    document.getElementById('bd-efh').textContent   = (EH/H).toFixed(4)+' kg CO₂e / kWh';
+    document.getElementById('bd-fp').textContent    = (fp*100).toFixed(1)+' %';
+    document.getElementById('bd-fh').textContent    = (fh*100).toFixed(1)+' %';
+    document.getElementById('breakdown').style.display='block';
+    document.getElementById('insight').style.display='block';
+  }
+  ['fuelin','power','heat','ep','eh'].forEach(id=>document.getElementById(id).addEventListener('keydown', e=>{ if(e.key==='Enter') calculate(); }));
+
+</script>
+</body>
+</html>
