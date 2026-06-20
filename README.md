@@ -7,7 +7,8 @@
 ### Open-source, zero-dependency demos of production carbon calculators.
 
 Eight self-contained demos spanning the full corporate inventory — **Scope 1, 2 and 3**, plus
-target-setting, financed emissions and climate disclosure.
+target-setting, financed emissions and climate disclosure — with **seven more** live Scope 1 &
+Scope 2 calculators linked.
 
 [**Live demos**](https://greencalculus.github.io/greencalculus-calculator-demo/) · [greencalculus.com](https://greencalculus.com) · [Methodology](https://github.com/greencalculus/greencalculus-methodology) · [Standards](https://github.com/greencalculus/greencalculus-standards)
 
@@ -47,7 +48,31 @@ GHG Protocol and IPCC AR6. Open the demo, or jump straight to the full live calc
 | 💰 **[PCAF Financed Emissions](./pcaf-financed-emissions.html)** | All 7 PCAF Part A asset classes + DQ score; hub to the 10-calc suite | [Open live ↗](https://greencalculus.com/calculators/pcaf-listed-equity-corporate-bonds/) |
 | 🛂 **[CBAM Quarterly Reporting](./cbam-quarterly-reporting.html)** | Embedded emissions + certificate liability across the 6 CBAM goods; hub to the 12-calc disclosure suite | [Open live ↗](https://greencalculus.com/calculators/cbam-quarterly-reporting-calculator/) |
 
-The landing page ([`index.html`](./index.html)) is a gallery linking all eight.
+The landing page ([`index.html`](./index.html)) is a gallery linking all eight demos — plus the seven more live calculators below.
+
+### More live Scope 1 & Scope 2 calculators
+
+Seven further **Scope 1 & Scope 2** calculators shipped on
+[GreenCalculus.com](https://greencalculus.com/calculators/) in June 2026 — each GHG Protocol
+aligned, IPCC AR6 based, and fully sourced. Self-contained demos for these are on the way; for
+now they're linked live and grouped by scope.
+
+**Scope 1 · Direct emissions**
+
+| Calculator | What it does | Live |
+|---|---|---|
+| **Biomass & Biofuel** | Split biomass/biofuel combustion into fossil CO₂e (counted in Scope 1) and biogenic CO₂ (reported as a memo item) | [Open live ↗](https://greencalculus.com/calculators/scope-1-biomass-biofuel-calculator/) |
+| **Marine & Aviation Fuel (Own Operations)** | Scope 1 from owned or controlled ships and aircraft across marine & aviation fuels | [Open live ↗](https://greencalculus.com/calculators/scope-1-marine-aviation-fuel-own-operations-calculator/) |
+| **CHP / Cogeneration** | Allocate combined heat & power fuel emissions across electricity and useful heat via the efficiency method (spans Scope 1 + 2) | [Open live ↗](https://greencalculus.com/calculators/scope-1-chp-cogeneration-calculator/) |
+
+**Scope 2 · Purchased energy**
+
+| Calculator | What it does | Live |
+|---|---|---|
+| **Purchased Steam & Hot Water** | Steam & hot water → tCO₂e via enthalpy and supplier-fuel back-calculation, location & market based | [Open live ↗](https://greencalculus.com/calculators/scope-2-purchased-steam-hot-water-calculator/) |
+| **Residual Mix (AIB / Green-e)** | Apply the correct residual-mix factor to untracked electricity — the market-based default after contractual instruments | [Open live ↗](https://greencalculus.com/calculators/scope-2-residual-mix-calculator/) |
+| **Renewable Procurement (REC / PPA / VPPA / Onsite)** | Model how RECs, PPAs, VPPAs and onsite generation cut market-based Scope 2 emissions | [Open live ↗](https://greencalculus.com/calculators/scope-2-renewable-procurement-rec-ppa-calculator/) |
+| **District Heating & Cooling** | District heat & cooling → tCO₂e on a location- and market-based basis | [Open live ↗](https://greencalculus.com/calculators/scope-2-district-heating-cooling-calculator/) |
 
 ---
 
