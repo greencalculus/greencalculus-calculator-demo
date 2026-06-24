@@ -2,14 +2,14 @@
 
 <img src="https://raw.githubusercontent.com/greencalculus/.github/main/profile/assets/greencalculus-logo.png" width="72" height="72" alt="GreenCalculus" />
 
-# GreenCalculus — Carbon Calculator Demos
+# GreenCalculus — Open Carbon Accounting Calculators
 
-### Open-source, zero-dependency demos of production carbon calculators.
+### Open-source, zero-dependency reference implementations for corporate greenhouse-gas accounting.
 
-Fifteen self-contained demos spanning the full corporate inventory — **Scope 1, 2 and 3**, plus
+Fifteen self-contained calculators spanning the full corporate inventory — **Scope 1, 2 and 3**, plus
 target-setting, financed emissions and climate disclosure.
 
-[**Live demos**](https://greencalculus.github.io/greencalculus-calculator-demo/) · [greencalculus.com](https://greencalculus.com) · [Methodology](https://github.com/greencalculus/greencalculus-methodology) · [Standards](https://github.com/greencalculus/greencalculus-standards)
+[**Live preview**](https://greencalculus.github.io/greencalculus-calculator-demo/) · [greencalculus.com](https://greencalculus.com) · [Methodology](https://github.com/greencalculus/greencalculus-methodology) · [Standards](https://github.com/greencalculus/greencalculus-standards)
 
 ![Vanilla JS](https://img.shields.io/badge/Vanilla_JS-Zero_dependencies-04BF62?style=flat-square)
 ![Scope 1·2·3](https://img.shields.io/badge/GHG_Protocol-Scope_1·2·3-04BF62?style=flat-square)
@@ -21,22 +21,23 @@ target-setting, financed emissions and climate disclosure.
 
 ---
 
-Self-contained demos of production calculators from
-[GreenCalculus.com](https://greencalculus.com) — built for sustainability officers,
-engineers, and CSRD compliance teams. The gallery walks the whole corporate inventory:
+Self-contained, reusable reference implementations of corporate carbon-accounting
+calculators — built for sustainability officers, engineers, and CSRD compliance teams.
+The gallery walks the whole corporate inventory:
 roll everything up in the **GHG Inventory Aggregator**, then drill into **Scope 1**
 (combustion), **Scope 2** (electricity, dual reporting) and **Scope 3** (business travel
 + the value-chain suite) — alongside SBTi targets, FLAG land emissions, PCAF financed
 emissions and EU CBAM border carbon.
 
-Each demo is a **single HTML file**: vanilla JavaScript, zero dependencies, built to
-GHG Protocol and IPCC AR6. Open the demo, or jump straight to the full live calculator.
+Each calculator is a **single HTML file**: vanilla JavaScript, zero dependencies, built to
+GHG Protocol and IPCC AR6 — fork it, read it, embed it. Open a calculator, or jump to the
+full live version.
 
 ---
 
 ## Calculators
 
-| Demo | Scope | Live calculator |
+| Calculator | Scope | Live version |
 |---|---|---|
 | 📊 **[GHG Inventory Aggregator](./ghg-inventory-aggregator.html)** | Consolidate Scope 1 + 2 + 3 → dual location/market grand totals + scope split | [Open live ↗](https://greencalculus.com/calculators/ghg-inventory-aggregator-scope123-calculator/) |
 | 🔥 **[Scope 1 Stationary Combustion](./stationary-combustion.html)** | Direct fuel combustion → tCO₂e, 10 fuel types | [Open live ↗](https://greencalculus.com/calculators/scope-1-combustion-calculator/) |
@@ -54,7 +55,7 @@ GHG Protocol and IPCC AR6. Open the demo, or jump straight to the full live calc
 | 🔋 **[Scope 2 Renewable Procurement](./scope-2-renewable-procurement.html)** | REC / PPA / VPPA / onsite vs residual mix; reduction % | [Open live ↗](https://greencalculus.com/calculators/scope-2-renewable-procurement-rec-ppa-calculator/) |
 | 🌡️ **[Scope 2 District Heating & Cooling](./scope-2-district-heating.html)** | District heat & cooling → tCO₂e, location + market | [Open live ↗](https://greencalculus.com/calculators/scope-2-district-heating-cooling-calculator/) |
 
-The landing page ([`index.html`](./index.html)) is a gallery linking all fifteen demos.
+The landing page ([`index.html`](./index.html)) is a gallery linking all fifteen calculators.
 
 ---
 
@@ -170,9 +171,9 @@ Singapore).
 | Hosting | GitHub Pages |
 | License | MIT |
 
-> **Note:** these are simplified demonstrations. The production calculators on
-> GreenCalculus.com read live emission factors from the Master Brain data layer and
-> include full audit trails, export, and uncertainty disclosure.
+> **Note:** these are simplified, self-contained reference implementations. The production
+> calculators on GreenCalculus.com read live emission factors from the Master Brain data
+> layer and add full audit trails, export, and uncertainty disclosure.
 
 ---
 
@@ -185,9 +186,9 @@ All emission factors and GWP values are documented in:
 
 ## Full platform
 
-A demo of fifteen calculators from [GreenCalculus.com](https://greencalculus.com) — the
-traceable reference layer for corporate carbon accounting, built for sustainability
-officers, engineers, and CSRD compliance teams.
+Fifteen open reference calculators from the [GreenCalculus](https://greencalculus.com)
+traceable carbon-accounting platform — built for sustainability officers, engineers, and
+CSRD compliance teams.
 
 **Built and maintained by [Jeremiah Say](https://greencalculus.com/about/jeremiah-say/)**
 — Lead Systems Architect · GHG Protocol · IPCC AR6 · CSRD/ESRS E1 · SBTi · PCAF

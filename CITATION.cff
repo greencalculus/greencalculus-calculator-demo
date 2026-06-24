@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+title: "GreenCalculus — Open Carbon Accounting Calculators"
+message: "If you use these calculators or reference implementations, please cite them as below."
+type: software
+authors:
+  - given-names: Jeremiah
+    family-names: Say
+    affiliation: GreenCalculus
+    email: jeremiah@greencalculus.com
+repository-code: "https://github.com/greencalculus/greencalculus-calculator-demo"
+url: "https://greencalculus.com"
+abstract: >-
+  Open-source, zero-dependency reference implementations of corporate
+  greenhouse-gas accounting calculators spanning the full GHG Protocol
+  inventory (Scope 1, 2 and 3) plus science-based target setting (SBTi),
+  financed emissions (PCAF) and climate disclosure (CBAM). Each calculator
+  is a single self-contained HTML file aligned to the GHG Protocol and
+  IPCC AR6 GWP-100.
+keywords:
+  - carbon-accounting
+  - greenhouse-gas
+  - ghg-protocol
+  - scope-1-2-3-emissions
+  - ipcc-ar6
+  - sbti
+  - pcaf
+  - cbam
+  - sustainability
+license: MIT
+version: 2.5.0
+date-released: "2026-06-24"
